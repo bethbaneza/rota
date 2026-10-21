@@ -68,3 +68,27 @@ Supabase → **Authentication → URL Configuration**:
 - **Mais → Importar planilha:** escolha o arquivo (CSV ou Excel). O app reconhece a planilha do Bling,
   liga as colunas sozinho, deixa de fora os **fornecedores** e mostra tudo para você conferir antes de gravar.
   Importar o mesmo arquivo de novo **não duplica** (o CNPJ/CPF identifica o cliente).
+
+---
+
+# Etapa 2 — Mapa, localização e rota do dia
+
+## 1) Rodar o SQL
+SQL Editor → cole `supabase-rota-etapa2.sql` → Run. As 3 linhas finais precisam dizer **ok**.
+
+## 2) Chave do OpenRouteService (distâncias pelas ruas)
+1. Crie a conta em `openrouteservice.org` e, no Dashboard, gere um token do tipo **Free**.
+2. Supabase → **Edge Functions → Deploy new function** → nome `rota-ors` → cole o conteúdo de
+   `supabase/functions/rota-ors/index.ts`. Deixe **"Verify JWT" LIGADO** (padrão).
+3. **Edge Functions → Secrets → Add secret:** nome `ORS_API_KEY`, valor = o token. (Nunca no chat.)
+
+Sem a chave, o app continua funcionando: calcula uma estimativa pela distância em linha reta e avisa na tela.
+
+## 3) Usar
+- **Mais → Minha casa e visitas:** endereço de saída/volta e tempo padrão de visita.
+- **Clientes → Localizar agora:** converte os endereços em pontos no mapa (1 a 3 s por cliente).
+  Pontos laranja = localização aproximada (pelo CEP); corrija o endereço no cadastro para ficar exato.
+- **Clientes → Mapa:** todos os clientes no mapa, com filtro por representada.
+- **Rota:** marque os clientes do dia, escolha a data e a hora de saída e toque em **Calcular melhor rota**.
+  A rota mostra a ordem, o horário previsto de cada parada, a distância e o tempo; abre no Waze/Google Maps; **Salvar rota**
+  guarda o dia e permite marcar cada visita como feita.

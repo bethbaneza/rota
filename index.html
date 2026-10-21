@@ -150,6 +150,23 @@ td{padding:10px 12px;border-top:1px solid var(--n-100);vertical-align:top}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (min-width:760px){.nav{display:none}.wrap{padding-bottom:48px}.topnav{display:flex!important}.toast{bottom:24px}}
+.mapbox{height:340px;border-radius:16px;overflow:hidden;border:1px solid var(--n-200);margin-bottom:14px;background:var(--n-100)}
+.leaflet-container{font-family:var(--font)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{background:var(--white);border:1px solid var(--n-200);border-radius:16px;padding:12px 14px}
+.kpi b{display:block;font:600 20px var(--display);color:var(--navy-900)}
+.kpi span{font-size:12px;color:var(--n-500)}
+.stop{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--n-100);align-items:flex-start}
+.stop:last-child{border-bottom:0}
+.stop .num{width:30px;height:30px;border-radius:50%;background:var(--green-500);color:#fff;display:grid;place-items:center;font:700 13px var(--display);flex:none;margin-top:2px}
+.stop.feito{opacity:.55}.stop.feito .num{background:var(--n-400)}
+.stop .t{font-weight:600;color:var(--navy-900);line-height:1.3}
+.stop .d{font-size:13px;color:var(--n-500);line-height:1.4}
+.stop .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pick{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--n-100);min-height:60px;cursor:pointer}
+.pick:last-child{border-bottom:0}
+.pick input{width:22px;height:22px;accent-color:var(--green-500);flex:none}
+.pick.dis{opacity:.5;cursor:not-allowed}
 .topnav{display:none;gap:4px}
 .topnav a{color:rgba(255,255,255,.8);text-decoration:none;font:500 13.5px var(--font);padding:10px 14px;border-radius:10px}
 .topnav a.on,.topnav a:hover{background:rgba(255,255,255,.12);color:var(--white)}
@@ -269,7 +286,7 @@ async function lerArquivo(file){
 
 /* ===================== estado e dados ===================== */
 let supa=null;
-const S={perfil:null,reps:[],clientes:[],contatos:[]};
+const S={perfil:null,uid:null,reps:[],clientes:[],contatos:[],rotas:[]};
 async function pagina(tabela){
   const out=[];
   for(let de=0;;de+=1000){
@@ -281,6 +298,8 @@ async function pagina(tabela){
 async function carregar(){
   const[r,c,t]=await Promise.all([pagina("rota_representadas"),pagina("rota_clientes"),pagina("rota_contatos")]);
   S.reps=r;S.clientes=c;S.contatos=t;
+  try{S.rotas=(await pagina("rota_rotas")).sort((a,b)=>String(b.data).localeCompare(String(a.data))||String(b.criado_em).localeCompare(String(a.criado_em)));}
+  catch(e){S.rotas=[];}   // a tabela da Etapa 2 pode ainda não existir: o resto do app segue funcionando
 }
 const cliPorId=id=>S.clientes.find(c=>c.id===id);
 const contatosDe=id=>S.contatos.filter(t=>t.cliente_id===id);
@@ -326,9 +345,10 @@ async function abrirApp(user){
   show("v-load");
   let perfil=null;
   for(let i=0;i<8&&!perfil;i++){   // o perfil nasce por gatilho logo depois do cadastro: pode levar um instante
-    const{data}=await supa.from("rota_perfis").select("nome,plano,trial_ate").eq("id",user.id).maybeSingle();
+    const{data}=await supa.from("rota_perfis").select("*").eq("id",user.id).maybeSingle();
     perfil=data;if(!perfil)await sleep(400);
   }
+  S.uid=user.id;
   if(!perfil){
     await supa.auth.signOut();telaAuth("entrar");
     aviso("Esta conta não é do Banheza Rota. Crie uma conta nova aqui, com o mesmo e-mail ou outro.");return;
@@ -379,16 +399,16 @@ async function esqueci(){
 /* ===================== roteador ===================== */
 const NAV=[["inicio","house","Início"],["clientes","users","Clientes"],["rota","route","Rota"],["mais","ellipsis","Mais"]];
 function desenhaNav(atual){
-  const grupo={inicio:"inicio",clientes:"clientes",rota:"rota",mais:"mais",representadas:"mais",importar:"mais"}[atual]||"inicio";
-  $("#nav").innerHTML=NAV.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""} ${k==="rota"?"off":""}" ${k==="rota"?'aria-disabled="true" title="Em breve"':""}>${IC(i)}<span>${t}</span></a>`).join("");
-  $("#topnav").innerHTML=NAV.filter(n=>n[0]!=="rota").map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""}">${t}</a>`).join("")+`<a href="#/importar" class="${atual==="importar"?"on":""}">Importar</a>`;
+  const grupo={inicio:"inicio",clientes:"clientes",mapa:"clientes",rota:"rota",mais:"mais",representadas:"mais",importar:"mais",casa:"mais"}[atual]||"inicio";
+  $("#nav").innerHTML=NAV.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""}">${IC(i)}<span>${t}</span></a>`).join("");
+  $("#topnav").innerHTML=NAV.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""}">${t}</a>`).join("")+`<a href="#/importar" class="${atual==="importar"?"on":""}">Importar</a>`;
 }
 function rota(){
   if(!S.perfil)return;
   const [r,a]=(location.hash.replace(/^#\/?/,"")||"inicio").split("/");
   const v=$("#view");window.scrollTo(0,0);
   desenhaNav(r);
-  const mapa={inicio:telaInicio,clientes:()=>a?telaCliente(v,a):telaClientes(v),representadas:telaReps,importar:telaImportar,mais:telaMais};
+  const mapa={inicio:telaInicio,clientes:()=>a?telaCliente(v,a):telaClientes(v),mapa:telaMapa,rota:telaRota,casa:telaCasa,representadas:telaReps,importar:telaImportar,mais:telaMais};
   (mapa[r]||telaInicio)(v);
 }
 window.addEventListener("hashchange",rota);
@@ -406,12 +426,13 @@ function telaInicio(v){
     </div>
     ${S.clientes.length?"":`<div class="empty"><p>Você ainda não tem clientes. Cadastre o primeiro ou importe a sua carteira por planilha.</p><div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div></div>`}
     ${semEnd?`<div class="msg warn">${semEnd} cliente${semEnd>1?"s":""} sem endereço. Sem endereço, o cliente não entra na rota do dia.</div>`:""}
-    <div class="card"><h2>Rota do dia</h2><p>Escolha as visitas do dia e receba a melhor ordem pelas ruas, com a distância e o tempo. Em breve.</p></div>`;
+    <div class="card"><h2>Rota do dia</h2><p>Escolha as visitas do dia e receba a melhor ordem pelas ruas, com a distância e o tempo.</p><a class="btn primary" href="#/rota">Montar a rota de hoje</a></div>`;
 }
 
 function telaMais(v){
   v.innerHTML=`<p class="eyebrow">Mais</p><h1>Mais opções</h1><p class="lead">${esc(S.perfil.nome||"")}</p>
     <div class="list">
+      <a class="item" href="#/casa"><span class="avatar">${IC("house")}</span><div class="grow"><div class="t">Minha casa e visitas</div><div class="d">${S.perfil.casa_lat!=null?"Ponto de saída definido":"Defina o seu ponto de saída"} · visita padrão de ${S.perfil.visita_padrao_min||45} min</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/representadas"><span class="avatar">${IC("building-2")}</span><div class="grow"><div class="t">Representadas</div><div class="d">As empresas que você atende</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/importar"><span class="avatar">${IC("file-spreadsheet")}</span><div class="grow"><div class="t">Importar planilha</div><div class="d">Traga clientes do Bling ou de qualquer sistema</div></div>${IC("chevron-right","sm")}</a>
     </div>
@@ -458,7 +479,9 @@ function formRep(r){
 /* ---------- lista de clientes ---------- */
 let FILTRO={q:"",rep:""};
 function telaClientes(v){
-  v.innerHTML=`<div class="row between"><div><p class="eyebrow">Carteira</p><h1>Clientes</h1></div><a class="btn primary sm" href="#/clientes/novo">${IC("plus","sm")} Novo</a></div>
+  const semLoc=S.clientes.filter(c=>c.ativo&&c.lat==null&&(c.endereco||c.cep||c.cidade)&&c.geo_status!=="falhou").length;
+  v.innerHTML=`<div class="row between"><div><p class="eyebrow">Carteira</p><h1>Clientes</h1></div><div class="actbar"><a class="btn sec sm" href="#/mapa">${IC("map-pin","sm")} Mapa</a><a class="btn primary sm" href="#/clientes/novo">${IC("plus","sm")} Novo</a></div></div>
+    ${semLoc?`<div class="msg warn row between" style="margin-bottom:14px"><span>${semLoc} cliente${semLoc>1?"s":""} sem localização no mapa.</span><button class="btn sec sm" id="loc">Localizar agora</button></div>`:""}
     <div class="search">${IC("search")}<input id="q" type="search" placeholder="Buscar nome, CNPJ ou cidade" value="${esc(FILTRO.q)}" aria-label="Buscar clientes"></div>
     ${S.reps.length?`<div class="chips" id="chips"><button class="chip ${FILTRO.rep===""?"on":""}" data-r="">Todas</button>${S.reps.map(r=>`<button class="chip ${FILTRO.rep===r.id?"on":""}" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
     <p class="lead" id="cont" style="margin-bottom:10px"></p><div id="lista"></div>`;
@@ -478,6 +501,7 @@ function telaClientes(v){
     }).join("")}</div>${lista.length>300?`<p class="lead" style="margin-top:10px">Mostrando 300 de ${lista.length}. Use a busca para achar os demais.</p>`:""}`
       :`<div class="empty"><p>${S.clientes.length?"Nenhum cliente encontrado. Tente outra busca.":"Você ainda não tem clientes. Cadastre o primeiro ou importe uma planilha."}</p>${S.clientes.length?"":`<div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div>`}</div>`;
   };
+  v.querySelector("#loc")&&(v.querySelector("#loc").onclick=()=>abreLocalizacao(()=>rota()));
   v.querySelector("#q").oninput=e=>{FILTRO.q=e.target.value;desenha();};
   v.querySelectorAll("#chips .chip").forEach(b=>b.onclick=()=>{FILTRO.rep=b.dataset.r;v.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("on",x===b));desenha();});
   desenha();
@@ -831,6 +855,371 @@ async function executaImportacao(v){
     res.innerHTML=`<div class="msg err">${esc(erroBanco(e))} O que já foi gravado antes do erro continua salvo; você pode importar de novo — quem já existe não duplica.</div><div class="actbar"><button class="btn sec" id="vol3">Voltar</button></div>`;
     res.querySelector("#vol3").onclick=()=>{IMP.passo=3;telaImportar(v);};
   }
+}
+
+/* ===================== mapa, localização e rota (Etapa 2) ===================== */
+const rad=x=>x*Math.PI/180;
+function kmLinha(a,b){const R=6371,dLat=rad(b.lat-a.lat),dLng=rad(b.lng-a.lng);const h=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+const hojeISO=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const minHora=m=>{m=Math.round(m);const h=Math.floor(m/60)%24,mm=m%60;return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0");};
+const horaMin=s=>{const m=/^(\d{1,2}):(\d{2})$/.exec(s||"");return m?(+m[1])*60+(+m[2]):480;};
+const fmtDur=m=>{m=Math.round(m);const h=Math.floor(m/60),r=m%60;return h?(h+"h"+(r?" "+String(r).padStart(2,"0")+"min":"")):(r+" min");};
+const fmtKm=k=>(Math.round(k*10)/10).toString().replace(".",",")+" km";
+const fmtDiaSemana=iso=>{try{return new Date(iso+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short"});}catch(e){return iso;}};
+const lnkWaze=p=>`https://waze.com/ul?ll=${p.lat},${p.lng}&navigate=yes`;
+const lnkMaps=p=>`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=driving`;
+const enderecoLinha=c=>[[c.endereco,c.numero].filter(Boolean).join(", "),c.bairro,[c.cidade,c.uf].filter(Boolean).join("/")].filter(Boolean).join(" · ");
+const ROT_GEO={numero:"",rua:"",cep:"localização aproximada (CEP)",cidade:"só a cidade — corrija o endereço",falhou:"não encontrado",pendente:""};
+
+let leafletP=null;
+function carregaLeaflet(){
+  if(window.L)return Promise.resolve(true);
+  if(leafletP)return leafletP;
+  leafletP=new Promise(res=>{
+    const css=document.createElement("link");css.rel="stylesheet";css.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(css);
+    const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>res(!!window.L);s.onerror=()=>res(false);document.head.appendChild(s);
+  });
+  return leafletP;
+}
+function novoMapa(el){
+  const m=L.map(el).setView([-15.8,-47.9],4);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);
+  return m;
+}
+const pino=(txt,cor)=>L.divIcon({className:"",html:`<div style="background:${cor||"#008048"};color:#fff;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:700 13px Montserrat,sans-serif;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,16,48,.35)">${esc(txt)}</div>`,iconSize:[28,28],iconAnchor:[14,14]});
+
+/* ---- endereço -> ponto no mapa (Nominatim/OpenStreetMap, gratuito: 1 consulta por segundo) ---- */
+async function nominatimBruto(params){
+  for(let t=0;t<3;t++){
+    let r;
+    // GET simples (sem cabeçalhos extras). Quando o serviço gratuito pede calma (429), a resposta vem sem CORS e o
+    // navegador a mostra como "falha de rede": tratamos igual — espera um pouco e tenta de novo.
+    try{r=await fetch("https://nominatim.openstreetmap.org/search?"+new URLSearchParams({format:"jsonv2",limit:"5",addressdetails:"1",countrycodes:"br",...params}),{cache:"no-store"});}   // no-store: nunca reaproveitar uma resposta de erro guardada pelo navegador
+    catch(e){await sleep(3000*(t+1));continue;}
+    if(r.status===429||r.status===503){await sleep(2500*(t+1));continue;}
+    if(!r.ok)throw new Error("geocoder "+r.status);
+    const lista=(await r.json()).filter(x=>{const lat=+x.lat,lng=+x.lon;return lat<6&&lat>-34&&lng<-30&&lng>-74;});   // fora do Brasil = resultado errado
+    return lista;
+  }
+  throw new Error("geocoder ocupado");
+}
+// Cada cidade é buscada uma vez; as ruas depois são procuradas SÓ dentro da área dessa cidade
+// (sem isso, "Rua Augusta, 500, São Paulo" pode cair em outra cidade que também tem uma Rua Augusta).
+const cacheCidade=new Map();
+async function infoCidade(cidade,uf){
+  const k=chave(cidade)+"|"+String(uf||"").toLowerCase();
+  if(cacheCidade.has(k))return cacheCidade.get(k);
+  const x=(await nominatimBruto({q:[cidade,uf].filter(Boolean).join(", ")}))[0];await sleep(1100);   // (countrycodes=br já restringe ao Brasil)
+  let r=null;
+  if(x&&x.boundingbox){const b=x.boundingbox.map(Number);r={lat:+x.lat,lng:+x.lon,vb:[b[2],b[1],b[3],b[0]].join(",")};}
+  cacheCidade.set(k,r);return r;
+}
+async function localizar(o){
+  const rua=String(o.endereco||o.casa_endereco||"").trim(),num=String(o.numero||o.casa_numero||"").trim();
+  const info=o.cidade?await infoCidade(o.cidade,o.uf):null;
+  const area=info?{viewbox:info.vb,bounded:"1"}:{};
+  // o resultado só vale se o MUNICÍPIO dele for o do cliente (Guarulhos fica dentro da área de São Paulo, por exemplo)
+  const naCidade=x=>{
+    if(!o.cidade||!info)return true;
+    const a=x.address||{},mun=a.city||a.town||a.municipality||a.village||a.county||"";
+    return mun?chave(mun)===chave(o.cidade):semAcento(x.display_name||"").includes(semAcento(o.cidade));
+  };
+  const t=[];
+  if(rua&&o.cidade&&/\d/.test(num))t.push(["numero",{q:`${rua}, ${num}, ${o.cidade}`,...area}]);
+  if(rua&&o.cidade)t.push(["rua",{q:`${rua}, ${o.cidade}`,...area}]);
+  if(dig(o.cep).length===8)t.push(["cep",{postalcode:fmtCep(o.cep)}]);   // sem "area": o CEP já é específico; a conferência da cidade vem abaixo
+  for(const[status,p] of t){
+    const lista=await nominatimBruto(p);await sleep(1100);   // respeita o limite gratuito do serviço
+    const x=lista.find(naCidade);
+    if(x)return{lat:+x.lat,lng:+x.lon,status};
+  }
+  if(info)return{lat:info.lat,lng:info.lng,status:"cidade"};
+  return{status:"falhou"};
+}
+async function buscaCep(cep){
+  const d=dig(cep);if(d.length!==8)return null;
+  try{const r=await fetch("https://viacep.com.br/ws/"+d+"/json/");const j=await r.json();return j.erro?null:j;}catch(e){return null;}
+}
+function abreLocalizacao(depois){
+  const lista=S.clientes.filter(c=>c.ativo&&c.lat==null&&(c.endereco||c.cep||c.cidade)&&c.geo_status!=="falhou");
+  if(!lista.length)return toast("Todos os clientes já estão no mapa.");
+  let cancelar=false;
+  sheet(`<h2>Localizar clientes no mapa</h2><p>Buscamos cada endereço, um por vez (cerca de 1 a 3 segundos por cliente). Pode deixar esta tela aberta.</p>
+    <div class="progress"><i id="pb"></i></div><p id="pt" style="margin:10px 0 16px">${lista.length} cliente(s) para localizar.</p>
+    <div class="actbar"><button class="btn primary" id="pgo">Começar</button><button class="btn sec" id="pcl">Fechar</button></div>`,d=>{
+    d.querySelector("#pcl").onclick=()=>{cancelar=true;closeSheet();depois&&depois();};
+    d.querySelector("#pgo").onclick=async()=>{
+      d.querySelector("#pgo").disabled=true;
+      let exato=0,aprox=0,falha=0,erros=0,parou="";
+      for(let i=0;i<lista.length&&!cancelar;i++){
+        const c=lista[i],pt=d.querySelector("#pt"),pb=d.querySelector("#pb");if(!pt)break;
+        pt.textContent=`Localizando ${i+1} de ${lista.length}: ${nomeCli(c)}`;pb.style.width=Math.round(i/lista.length*100)+"%";
+        let r;
+        try{r=await localizar(c);}catch(e){erros++;await sleep(2000);continue;}   // sem internet/serviço fora: tenta o próximo e deixa este para depois
+        const upd=r.status==="falhou"?{geo_status:"falhou"}:{lat:r.lat,lng:r.lng,geo_status:r.status};
+        const{data,error}=await supa.from("rota_clientes").update(upd).eq("id",c.id).select().single();
+        if(error){parou=erroBanco(error)+(/geo_status|column/i.test(String(error.message))?" Rode o arquivo supabase-rota-etapa2.sql.":"");break;}
+        Object.assign(c,data);
+        if(r.status==="falhou")falha++;else if(r.status==="cep"||r.status==="cidade")aprox++;else exato++;
+      }
+      const pt=d.querySelector("#pt");if(!pt)return;
+      d.querySelector("#pb").style.width="100%";
+      pt.innerHTML=parou?`<span style="color:var(--danger)">${esc(parou)}</span>`
+        :`Pronto. ${exato} localizado(s) com precisão, ${aprox} de forma aproximada, ${falha} não encontrado(s)${erros?`, ${erros} para tentar de novo (falha de conexão)`:""}.${aprox||falha?" Os aproximados e não encontrados podem ser corrigidos no cadastro do cliente (rua, número e CEP).":""}`;
+      d.querySelector("#pgo").hidden=true;d.querySelector("#pcl").textContent="Concluir";
+    };
+  });
+}
+
+/* ---- matriz de tempos, melhor ordem ---- */
+function matrizEstimada(pts){
+  const n=pts.length,dist=[],dur=[];
+  for(let i=0;i<n;i++){dist.push([]);dur.push([]);for(let j=0;j<n;j++){const km=i===j?0:kmLinha(pts[i],pts[j])*1.3;dist[i].push(km*1000);dur[i].push(km/45*3600);}}
+  return{dist,dur,tipo:"estimativa"};
+}
+async function matriz(pts){
+  const est=matrizEstimada(pts);
+  try{
+    const{data,error}=await supa.functions.invoke("rota-ors",{body:{tipo:"matriz",locais:pts.map(p=>[p.lng,p.lat])}});
+    if(error)throw error;
+    if(!data||!data.ok)return{...est,motivo:(data&&data.msg)||"serviço de rotas indisponível"};
+    const fix=(M,E)=>M.map((l,i)=>l.map((x,j)=>(typeof x==="number"?x:E[i][j])));
+    return{dist:fix(data.distancias,est.dist),dur:fix(data.duracoes,est.dur),tipo:"ruas"};
+  }catch(e){return{...est,motivo:"serviço de rotas indisponível"};}
+}
+function melhorOrdem(dur,n,voltar){   // 0 = saída; 1..n = paradas
+  if(n<=0)return[];
+  if(n===1)return[1];
+  const custo=ord=>{let c=dur[0][ord[0]];for(let i=0;i<ord.length-1;i++)c+=dur[ord[i]][ord[i+1]];return c+(voltar?dur[ord[ord.length-1]][0]:0);};
+  if(n<=15){   // exato (programação dinâmica por subconjuntos)
+    const N=1<<n,INF=1e18,dp=new Float64Array(N*n).fill(INF),pai=new Int8Array(N*n).fill(-1);
+    for(let i=0;i<n;i++)dp[(1<<i)*n+i]=dur[0][i+1];
+    for(let m=1;m<N;m++)for(let l=0;l<n;l++){
+      const v=dp[m*n+l];if(v>=INF||!(m&(1<<l)))continue;
+      for(let k=0;k<n;k++){if(m&(1<<k))continue;const nm=m|(1<<k),c=v+dur[l+1][k+1];if(c<dp[nm*n+k]){dp[nm*n+k]=c;pai[nm*n+k]=l;}}
+    }
+    let best=INF,bl=0;const full=N-1;
+    for(let l=0;l<n;l++){const c=dp[full*n+l]+(voltar?dur[l+1][0]:0);if(c<best){best=c;bl=l;}}
+    const ord=[];let m=full,l=bl;
+    while(l>=0){ord.push(l+1);const p=pai[m*n+l];m&=~(1<<l);l=p;}
+    return ord.reverse();
+  }
+  // muitas paradas: vizinho mais próximo + melhoria 2-opt
+  let rest=[...Array(n).keys()].map(i=>i+1),ord=[],cur=0;
+  while(rest.length){let bi=0;for(let i=1;i<rest.length;i++)if(dur[cur][rest[i]]<dur[cur][rest[bi]])bi=i;cur=rest.splice(bi,1)[0];ord.push(cur);}
+  let melhorou=true,voltas=0;
+  while(melhorou&&voltas++<50){melhorou=false;
+    for(let i=0;i<ord.length-1;i++)for(let j=i+1;j<ord.length;j++){
+      const nv=[...ord.slice(0,i),...ord.slice(i,j+1).reverse(),...ord.slice(j+1)];
+      if(custo(nv)<custo(ord)-1){ord=nv;melhorou=true;}
+    }
+  }
+  return ord;
+}
+
+/* ---- Minha casa (ponto de saída) ---- */
+function telaCasa(v){
+  const p=S.perfil;
+  const f=(id,rot,val,extra)=>`<div class="f"><label for="${id}">${rot}</label><input id="${id}" value="${esc(val||"")}" ${extra||""}></div>`;
+  v.innerHTML=`<div class="row between" style="margin-bottom:8px"><a class="iconbtn" href="#/mais" aria-label="Voltar">${IC("arrow-left")}</a><h1 style="font-size:20px;flex:1;margin:0 12px">Minha casa e visitas</h1></div>
+    <p class="lead">A rota começa e termina aqui, a não ser que você escolha outro ponto.</p><div id="msg"></div>
+    <div class="card"><h2>Ponto de saída</h2>
+      <div class="f"><label for="h_cep">CEP</label><input id="h_cep" inputmode="numeric" maxlength="9" value="${esc(fmtCep(p.casa_cep))}" placeholder="00000-000"><span class="hint" id="h_cepmsg">Digite o CEP para preencher o endereço.</span></div>
+      ${f("h_rua","Rua / avenida",p.casa_endereco)}
+      <div class="grid2">${f("h_num","Número",p.casa_numero)}${f("h_bairro","Bairro",p.casa_bairro)}</div>
+      <div class="grid2 keep">${f("h_cid","Cidade",p.casa_cidade)}${f("h_uf","UF",p.casa_uf,'maxlength="2"')}</div>
+      ${p.casa_lat!=null?`<p style="margin:0;color:var(--green-500)">Ponto no mapa definido.</p>`:`<p style="margin:0">Ponto no mapa ainda não definido.</p>`}
+    </div>
+    <div class="card"><h2>Visitas</h2>
+      <div class="f"><label for="h_min">Tempo padrão de cada visita (minutos)</label><input id="h_min" inputmode="numeric" value="${esc(p.visita_padrao_min||45)}"><span class="hint">Vale quando o cliente não tem um tempo próprio no cadastro.</span></div>
+    </div>
+    <div class="actbar"><button class="btn primary" id="h_salvar">Salvar</button><a class="btn sec" href="#/mais">Cancelar</a></div>`;
+  const cep=v.querySelector("#h_cep"),cm=v.querySelector("#h_cepmsg");
+  cep.oninput=async()=>{
+    const d=dig(cep.value);if(d.length>5)cep.value=d.slice(0,5)+"-"+d.slice(5,8);
+    if(d.length!==8){cm.textContent="Digite o CEP para preencher o endereço.";return;}
+    cm.textContent="Buscando…";const j=await buscaCep(d);
+    if(!j){cm.textContent="CEP não encontrado. Preencha à mão.";return;}
+    const set=(id,val)=>{const e=v.querySelector(id);if(e&&!e.value.trim()&&val)e.value=val;};
+    set("#h_rua",j.logradouro);set("#h_bairro",j.bairro);set("#h_cid",j.localidade);set("#h_uf",j.uf);
+    cm.textContent="Endereço preenchido. Informe o número.";v.querySelector("#h_num").focus();
+  };
+  v.querySelector("#h_salvar").onclick=async()=>{
+    const g=id=>v.querySelector(id).value.trim();
+    const msg=(t,tp)=>{v.querySelector("#msg").innerHTML=`<div class="msg ${tp||"err"}">${esc(t)}</div>`;window.scrollTo(0,0);};
+    const min=parseInt(g("#h_min"),10);
+    if(!(min>=5&&min<=480))return msg("O tempo de visita deve ficar entre 5 e 480 minutos.");
+    if(!g("#h_rua")||!g("#h_cid"))return msg("Informe pelo menos a rua e a cidade da sua casa.");
+    const b=v.querySelector("#h_salvar");b.disabled=true;b.textContent="Localizando no mapa…";
+    try{
+      const o={endereco:g("#h_rua"),numero:g("#h_num"),bairro:g("#h_bairro"),cidade:g("#h_cid"),uf:g("#h_uf").toUpperCase(),cep:dig(g("#h_cep"))};
+      const r=await localizar(o);
+      if(r.status==="falhou"||r.status==="cidade"){b.disabled=false;b.textContent="Salvar";return msg("Não encontramos esse endereço no mapa. Confira a rua, o número e a cidade.");}
+      const upd={casa_cep:o.cep,casa_endereco:o.endereco,casa_numero:o.numero,casa_bairro:o.bairro,casa_cidade:o.cidade,casa_uf:o.uf,casa_lat:r.lat,casa_lng:r.lng,visita_padrao_min:min};
+      const{data,error}=await supa.from("rota_perfis").update(upd).eq("id",S.uid).select().single();
+      if(error)throw error;
+      Object.assign(S.perfil,data);toast("Salvo.");location.hash="#/mais";
+    }catch(e){b.disabled=false;b.textContent="Salvar";msg(erroBanco(e)+(/casa_|column/i.test(String(e&&e.message))?" Rode o arquivo supabase-rota-etapa2.sql.":""));}
+  };
+}
+
+/* ---- mapa da carteira ---- */
+async function telaMapa(v){
+  let rep="";
+  v.innerHTML=`<div class="row between"><div><p class="eyebrow">Carteira</p><h1>Mapa</h1></div><a class="btn sec sm" href="#/clientes">Lista</a></div>
+    ${S.reps.length?`<div class="chips" id="chips"><button class="chip on" data-r="">Todas</button>${S.reps.map(r=>`<button class="chip" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
+    <div id="mapa" class="mapbox"></div><p class="lead" id="mapinfo"></p>`;
+  if(!(await carregaLeaflet())){v.querySelector("#mapa").innerHTML='<div class="msg err" style="margin:14px">Não foi possível carregar o mapa. Verifique a internet.</div>';return;}
+  const m=novoMapa(v.querySelector("#mapa")),camada=L.layerGroup().addTo(m);
+  const desenha=()=>{
+    camada.clearLayers();
+    const cs=S.clientes.filter(c=>c.ativo&&c.lat!=null&&(!rep||(c.representadas||[]).includes(rep)));
+    cs.forEach(c=>{
+      const mk=L.marker([c.lat,c.lng],{icon:pino("",c.geo_status==="cep"||c.geo_status==="cidade"?"#f2a71b":"#008048")}).addTo(camada);
+      mk.bindPopup(`<b>${esc(nomeCli(c))}</b><br>${esc(enderecoLinha(c))}<br><a href="#/clientes/${esc(c.id)}">Abrir cadastro</a>`);
+    });
+    if(cs.length)m.fitBounds(L.latLngBounds(cs.map(c=>[c.lat,c.lng])).pad(0.15),{maxZoom:15});
+    const sem=S.clientes.filter(c=>c.ativo&&c.lat==null).length;
+    v.querySelector("#mapinfo").innerHTML=`${cs.length} cliente(s) no mapa${sem?` · ${sem} sem localização. <a href="#/clientes">Localizar na lista</a>`:""}. Pontos em laranja têm localização aproximada.`;
+  };
+  v.querySelectorAll("#chips .chip").forEach(b=>b.onclick=()=>{rep=b.dataset.r;v.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("on",x===b));desenha();});
+  desenha();setTimeout(()=>m.invalidateSize(),200);
+}
+
+/* ---- rota do dia ---- */
+let R={sel:new Set(),q:"",rep:"",data:null,inicio:"08:00",voltar:true,res:null,calculando:false};
+function resumoSaida(){return {endereco:[S.perfil.casa_endereco,S.perfil.casa_numero].filter(Boolean).join(", "),lat:S.perfil.casa_lat,lng:S.perfil.casa_lng};}
+
+async function calcularRota(){
+  const casa=resumoSaida();
+  const stops=[...R.sel].map(cliPorId).filter(c=>c&&c.lat!=null);
+  const pts=[{lat:casa.lat,lng:casa.lng},...stops.map(c=>({lat:c.lat,lng:c.lng}))];
+  const M=await matriz(pts);
+  const ord=melhorOrdem(M.dur,stops.length,R.voltar);
+  const padrao=S.perfil.visita_padrao_min||45;
+  let t=horaMin(R.inicio),ant=0,km=0,seg=0,visitas=0;
+  const paradas=[];
+  ord.forEach((ix,k)=>{
+    const c=stops[ix-1],dm=M.dur[ant][ix]/60;
+    km+=M.dist[ant][ix]/1000;seg+=M.dur[ant][ix];t+=dm;
+    const dur=c.tempo_visita_min||padrao;
+    paradas.push({cliente_id:c.id,ordem:k+1,chegada:Math.round(t),dur,lat:c.lat,lng:c.lng,visitado:false,hora:""});
+    t+=dur;visitas+=dur;ant=ix;
+  });
+  let retorno=null;
+  if(R.voltar&&ord.length){km+=M.dist[ant][0]/1000;seg+=M.dur[ant][0];t+=M.dur[ant][0]/60;retorno=Math.round(t);}
+  // traçado pelas ruas (só se o serviço de rotas estiver ativo)
+  let geometria=null;
+  if(M.tipo==="ruas"){
+    try{
+      const seq=[0,...ord,...(R.voltar?[0]:[])].map(i=>pts[i]);
+      const{data}=await supa.functions.invoke("rota-ors",{body:{tipo:"rota",locais:seq.map(p=>[p.lng,p.lat])}});
+      if(data&&data.ok)geometria=data.geometria;
+    }catch(e){/* sem traçado: desenhamos linhas retas */}
+  }
+  R.res={id:null,paradas,km,minDirigindo:seg/60,minVisitas:visitas,retorno,saida:Math.round(horaMin(R.inicio)),calculo:M.tipo,motivo:M.motivo||"",geometria,voltar:R.voltar,data:R.data,casa};
+}
+
+function telaRota(v){
+  if(!R.data)R.data=hojeISO();
+  const casaOk=S.perfil.casa_lat!=null;
+  const comLoc=c=>c.ativo&&c.lat!=null;
+  const semLoc=S.clientes.filter(c=>c.ativo&&c.lat==null&&(c.endereco||c.cep||c.cidade)&&c.geo_status!=="falhou").length;
+  v.innerHTML=`<p class="eyebrow">Rota</p><h1>Rota do dia</h1>
+    <p class="lead">Marque os clientes que vai visitar e o app calcula a melhor ordem.</p>
+    ${casaOk?`<div class="card" style="padding:14px 16px"><div class="row between"><div class="grow"><div style="font:600 13px var(--font);color:var(--navy-900)">Saída${R.voltar?" e volta":""}</div><div style="font-size:13px;color:var(--n-500)">${esc(resumoSaida().endereco)} · ${esc(S.perfil.casa_cidade||"")}</div></div><a class="btn sec sm" href="#/casa">Alterar</a></div></div>`
+      :`<div class="msg warn row between"><span>Defina o endereço da sua casa para calcular a rota.</span><a class="btn sec sm" href="#/casa">Definir</a></div>`}
+    ${semLoc?`<div class="msg warn row between"><span>${semLoc} cliente${semLoc>1?"s":""} ainda sem localização.</span><button class="btn sec sm" id="loc">Localizar</button></div>`:""}
+    <div class="card"><h2>Clientes do dia</h2>
+      <div class="search" style="margin-bottom:10px">${IC("search")}<input id="rq" type="search" placeholder="Buscar nome ou cidade" value="${esc(R.q)}" aria-label="Buscar clientes"></div>
+      ${S.reps.length?`<div class="chips" id="rchips"><button class="chip ${R.rep===""?"on":""}" data-r="">Todas</button>${S.reps.map(r=>`<button class="chip ${R.rep===r.id?"on":""}" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
+      <div id="rlista"></div>
+      <p class="lead" id="rcont" style="margin:12px 0 0"></p>
+    </div>
+    <div class="card"><h2>Detalhes</h2>
+      <div class="grid2"><div class="f"><label for="r_data">Data</label><input id="r_data" type="date" value="${esc(R.data)}"></div><div class="f"><label for="r_ini">Hora de saída</label><input id="r_ini" type="time" value="${esc(R.inicio)}"></div></div>
+      <label class="chk"><input type="checkbox" id="r_volta" ${R.voltar?"checked":""}> Voltar para casa no fim</label>
+    </div>
+    <button class="btn primary block" id="calc" style="height:54px">Calcular melhor rota</button>
+    <div id="res" style="margin-top:22px"></div>
+    ${S.rotas.length?`<div class="sec-h"><h2>Rotas salvas</h2></div><div class="list">${S.rotas.slice(0,8).map(r=>`<div class="item" data-rt="${esc(r.id)}"><span class="avatar">${IC("route")}</span><div class="grow"><div class="t">${esc(fmtDiaSemana(r.data))}</div><div class="d">${(r.paradas||[]).length} visita(s)${r.total_km!=null?" · "+fmtKm(+r.total_km):""} · ${(r.paradas||[]).filter(p=>p.visitado).length} feita(s)</div></div>${IC("chevron-right","sm")}</div>`).join("")}</div>`:""}`;
+  const cont=()=>{v.querySelector("#rcont").textContent=R.sel.size?`${R.sel.size} selecionado(s)`:"Nenhum cliente selecionado.";v.querySelector("#calc").disabled=!casaOk||!R.sel.size||R.calculando;};
+  const lista=()=>{
+    const q=semAcento(R.q).trim();
+    const cs=S.clientes.filter(c=>c.ativo).filter(c=>!R.rep||(c.representadas||[]).includes(R.rep))
+      .filter(c=>!q||q.split(/\s+/).every(w=>semAcento([c.razao,c.fantasia,c.cidade,c.bairro].join(" ")).includes(w)))
+      .sort((a,b)=>nomeCli(a).localeCompare(nomeCli(b),"pt-BR"));
+    v.querySelector("#rlista").innerHTML=cs.length?`<div style="border:1px solid var(--n-200);border-radius:16px;overflow:hidden;max-height:360px;overflow-y:auto">${cs.slice(0,300).map(c=>`<label class="pick ${comLoc(c)?"":"dis"}"><input type="checkbox" data-c="${esc(c.id)}" ${R.sel.has(c.id)?"checked":""} ${comLoc(c)?"":"disabled"}><div class="grow"><div class="t" style="font-weight:600;color:var(--navy-900)">${esc(nomeCli(c))}</div><div class="d" style="font-size:13px;color:var(--n-500)">${esc([c.cidade,ROT_GEO[c.geo_status]||(c.lat==null?"sem localização":"")].filter(Boolean).join(" · "))}</div></div></label>`).join("")}</div>`
+      :`<div class="empty"><p>Nenhum cliente encontrado.</p></div>`;
+    v.querySelectorAll("#rlista [data-c]").forEach(i=>i.onchange=()=>{i.checked?R.sel.add(i.dataset.c):R.sel.delete(i.dataset.c);cont();});
+  };
+  v.querySelector("#rq").oninput=e=>{R.q=e.target.value;lista();};
+  v.querySelectorAll("#rchips .chip").forEach(b=>b.onclick=()=>{R.rep=b.dataset.r;v.querySelectorAll("#rchips .chip").forEach(x=>x.classList.toggle("on",x===b));lista();});
+  v.querySelector("#r_data").onchange=e=>{R.data=e.target.value||hojeISO();};
+  v.querySelector("#r_ini").onchange=e=>{R.inicio=e.target.value||"08:00";};
+  v.querySelector("#r_volta").onchange=e=>{R.voltar=e.target.checked;};
+  v.querySelector("#loc")&&(v.querySelector("#loc").onclick=()=>abreLocalizacao(()=>telaRota(v)));
+  v.querySelectorAll("[data-rt]").forEach(e=>e.onclick=async()=>{
+    const r=S.rotas.find(x=>x.id===e.dataset.rt);if(!r)return;
+    const sd=r.saida||{};
+    R.res={id:r.id,paradas:(r.paradas||[]).map(p=>({...p})),km:+r.total_km||0,minDirigindo:sd.min_dirigindo||0,minVisitas:sd.min_visitas||0,retorno:sd.retorno||null,saida:sd.inicio||480,calculo:r.calculo,motivo:"",geometria:null,voltar:!!sd.volta,data:r.data,casa:{endereco:sd.endereco||"",lat:sd.lat,lng:sd.lng}};
+    await mostraResultado(v);v.querySelector("#res").scrollIntoView({behavior:"smooth"});
+  });
+  v.querySelector("#calc").onclick=async()=>{
+    if(R.sel.size>25)return toast("Escolha no máximo 25 clientes por rota.");
+    const b=v.querySelector("#calc");R.calculando=true;b.disabled=true;b.textContent="Calculando…";
+    try{await calcularRota();await mostraResultado(v);v.querySelector("#res").scrollIntoView({behavior:"smooth"});}
+    catch(e){toast("Não foi possível calcular a rota. Tente de novo.");}
+    finally{R.calculando=false;b.textContent="Calcular melhor rota";cont();}
+  };
+  lista();cont();
+  if(R.res)mostraResultado(v);
+}
+
+async function mostraResultado(v){
+  const res=R.res,box=v.querySelector("#res");if(!res||!box)return;
+  const nomes=res.paradas.map(p=>cliPorId(p.cliente_id));
+  const trechos=[];
+  {const pts=res.paradas.map(p=>({lat:p.lat,lng:p.lng}));if(res.voltar&&res.casa&&res.casa.lat!=null)pts.push({lat:res.casa.lat,lng:res.casa.lng});
+   let origem={lat:res.casa.lat,lng:res.casa.lng};
+   for(let i=0;i<pts.length;i+=10){const bl=pts.slice(i,i+10),dest=bl[bl.length-1],way=bl.slice(0,-1);
+     trechos.push({de:i+1,ate:Math.min(i+10,res.paradas.length),url:`https://www.google.com/maps/dir/?api=1&origin=${origem.lat},${origem.lng}&destination=${dest.lat},${dest.lng}${way.length?"&waypoints="+encodeURIComponent(way.map(w=>w.lat+","+w.lng).join("|")):""}&travelmode=driving`});origem=dest;}}
+  box.innerHTML=`<div class="eyebrow">Sua rota</div><h2 style="font-size:20px;margin-bottom:12px">${esc(fmtDiaSemana(res.data))} · ${res.paradas.length} visita${res.paradas.length>1?"s":""}</h2>
+    ${res.calculo==="estimativa"?`<div class="msg warn">Estimativa pela distância em linha reta${res.motivo?" ("+esc(res.motivo)+")":""}. Com o serviço de rotas ativo, o cálculo usa as ruas de verdade.</div>`:""}
+    <div class="kpis"><div class="kpi"><b>${esc(fmtKm(res.km))}</b><span>Distância total</span></div><div class="kpi"><b>${esc(fmtDur(res.minDirigindo))}</b><span>Dirigindo</span></div>
+      <div class="kpi"><b>${esc(fmtDur(res.minVisitas))}</b><span>Em visitas</span></div><div class="kpi"><b>${res.retorno!=null?esc(minHora(res.retorno)):"—"}</b><span>${res.voltar?"Volta prevista":"Saída "+esc(minHora(res.saida))}</span></div></div>
+    <div id="rmapa" class="mapbox"></div>
+    <div class="list" id="rparadas">${res.paradas.map((p,i)=>{const c=nomes[i];return `<div class="stop ${p.visitado?"feito":""}"><span class="num">${p.ordem}</span><div class="grow"><div class="t">${esc(c?nomeCli(c):"Cliente removido")}</div>
+      <div class="d">Chega ${esc(minHora(p.chegada))} · fica ${esc(fmtDur(p.dur))}${c?"<br>"+esc(enderecoLinha(c)):""}</div>
+      <div class="acts"><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkWaze(p))}">Waze</a><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkMaps(p))}">Google Maps</a>
+      <label class="chk" style="min-height:40px"><input type="checkbox" data-v="${i}" ${p.visitado?"checked":""}> Visitado${p.visitado&&p.hora?" às "+esc(p.hora):""}</label></div></div></div>`;}).join("")}</div>
+    <div class="actbar" style="margin-top:14px">${trechos.length?trechos.map((t,i)=>`<a class="btn sec" target="_blank" rel="noopener" href="${esc(t.url)}">${IC("route","sm")} ${trechos.length>1?"Google Maps — trecho "+(i+1):"Abrir toda a rota no Google Maps"}</a>`).join(""):""}
+      <button class="btn primary" id="salvaRota" ${res.id?"disabled":""}>${res.id?"Rota salva":"Salvar rota"}</button></div>`;
+  box.querySelectorAll("[data-v]").forEach(i=>i.onchange=async()=>{
+    const p=res.paradas[+i.dataset.v];p.visitado=i.checked;p.hora=i.checked?minHora(new Date().getHours()*60+new Date().getMinutes()):"";
+    if(res.id){
+      const upd=await supa.from("rota_rotas").update({paradas:res.paradas.map(x=>({cliente_id:x.cliente_id,ordem:x.ordem,chegada:x.chegada,dur:x.dur,lat:x.lat,lng:x.lng,visitado:x.visitado,hora:x.hora||""}))}).eq("id",res.id).select().single();
+      if(upd.error)toast(erroBanco(upd.error));else{const r=S.rotas.find(x=>x.id===res.id);if(r)Object.assign(r,upd.data);}
+    }
+    mostraResultado(v);
+  });
+  box.querySelector("#salvaRota").onclick=async()=>{
+    const b=box.querySelector("#salvaRota");b.disabled=true;b.textContent="Salvando…";
+    const reg={data:res.data,titulo:"",saida:{endereco:res.casa.endereco,lat:res.casa.lat,lng:res.casa.lng,volta:res.voltar,inicio:res.saida,retorno:res.retorno,min_dirigindo:Math.round(res.minDirigindo),min_visitas:Math.round(res.minVisitas)},
+      paradas:res.paradas.map(x=>({cliente_id:x.cliente_id,ordem:x.ordem,chegada:x.chegada,dur:x.dur,lat:x.lat,lng:x.lng,visitado:x.visitado,hora:x.hora||""})),total_km:+res.km.toFixed(1),total_min:Math.round(res.minDirigindo+res.minVisitas),calculo:res.calculo};
+    const{data,error}=await supa.from("rota_rotas").insert(reg).select().single();
+    if(error){b.disabled=false;b.textContent="Salvar rota";return toast(erroBanco(error)+(/rota_rotas|relation|schema/i.test(String(error.message))?" Rode o arquivo supabase-rota-etapa2.sql.":""));}
+    res.id=data.id;S.rotas.unshift(data);toast("Rota salva.");mostraResultado(v);
+  };
+  // mapa da rota
+  if(!(await carregaLeaflet())){box.querySelector("#rmapa").innerHTML='<div class="msg err" style="margin:14px">Não foi possível carregar o mapa.</div>';return;}
+  const m=novoMapa(box.querySelector("#rmapa"));const ll=[];
+  if(res.casa&&res.casa.lat!=null){L.marker([res.casa.lat,res.casa.lng],{icon:pino("C","#001030")}).addTo(m).bindPopup("Saída");ll.push([res.casa.lat,res.casa.lng]);}
+  res.paradas.forEach((p,i)=>{const c=nomes[i];L.marker([p.lat,p.lng],{icon:pino(p.ordem,p.visitado?"#8a97a8":"#008048")}).addTo(m).bindPopup(esc(c?nomeCli(c):"Parada "+p.ordem));ll.push([p.lat,p.lng]);});
+  if(res.geometria){const g=L.geoJSON(res.geometria,{style:{color:"#0090f8",weight:4,opacity:.85}}).addTo(m);}
+  else if(ll.length>1){const linha=res.voltar&&res.casa&&res.casa.lat!=null?[...ll,ll[0]]:ll;L.polyline(linha,{color:"#0090f8",weight:3,opacity:.7,dashArray:"6 8"}).addTo(m);}
+  if(ll.length)m.fitBounds(L.latLngBounds(ll).pad(0.2),{maxZoom:15});
+  setTimeout(()=>m.invalidateSize(),200);
 }
 
 /* ===================== inicialização ===================== */
