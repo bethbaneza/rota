@@ -14,11 +14,12 @@
   /* tokens da marca Banheza (design system) — identidade verde, como o Assist */
   --green-900:#002820;--green-800:#003020;--green-700:#003828;--green-500:#008048;--green-400:#00c868;--green-300:#3ed87f;--green-200:#58e888;--green-100:#d5f7e3;
   --navy-900:#001030;
-  --white:#fff;--n-50:#f5f7fa;--n-100:#e9edf3;--n-200:#d6dde7;--n-400:#8a97a8;--n-500:#5d6a7e;--n-700:#2a3247;
-  --danger:#e2453c;--danger-soft:#fdeceb;--warn:#f2a71b;
+  --white:#fff;--n-50:#f5f7fa;--n-100:#e9edf3;--n-200:#d6dde7;--n-300:#b9c4d2;--n-400:#8a97a8;--n-500:#5d6a7e;--n-600:#3f4a5e;--n-700:#2a3247;
+  --danger:#e2453c;--danger-soft:#fdeceb;--warn:#f2a71b;--warn-soft:#fff4dc;
   --grad-assist:linear-gradient(180deg,var(--green-900) 0%,var(--green-700) 55%,var(--green-500) 100%);
   --display:"Exo 2",system-ui,sans-serif;--font:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r-field:14px;--r-card:20px;--ease:cubic-bezier(.2,.6,.2,1);
+  --nav-h:64px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
@@ -26,9 +27,12 @@ body{background:var(--n-50);color:var(--n-700);font:400 15px/1.55 var(--font);-w
 h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.2;letter-spacing:-.01em;color:var(--navy-900);margin:0;text-wrap:balance}
 [hidden]{display:none!important}
 a{color:var(--green-500)}
+button{font-family:inherit}
 :focus-visible{outline:3px solid rgba(0,144,248,.35);outline-offset:2px}
+.ic{display:inline-block;width:20px;height:20px;background:currentColor;-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat;flex:none;vertical-align:middle}
+.ic.sm{width:16px;height:16px}
 
-/* logotipo: símbolo + wordmark oficiais + palavra-produto */
+/* logotipo */
 .lockup{display:flex;align-items:center;gap:12px}
 .lockup img.mk{width:40px;height:40px;object-fit:contain}
 .lockup .wm{display:flex;flex-direction:column;align-items:flex-end;line-height:1}
@@ -42,44 +46,113 @@ a{color:var(--green-500)}
 .auth .lockup{margin-bottom:44px}
 .auth h1{color:var(--white);font-size:26px;margin-bottom:6px}
 .auth .sub{margin:0 0 26px;color:rgba(255,255,255,.74)}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.field label{font:500 13px/1.2 var(--font);color:rgba(255,255,255,.86)}
-.field input{height:50px;border-radius:var(--r-field);border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:var(--white);padding:0 16px;font:400 15px var(--font);width:100%}
-.field input::placeholder{color:rgba(255,255,255,.5)}
-.field input:focus{outline:none;border-color:var(--green-200);box-shadow:0 0 0 3px rgba(88,232,136,.22)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 22px;border-radius:var(--r-field);border:0;font:600 15px var(--font);cursor:pointer;width:100%;transition:transform .12s var(--ease),background .2s var(--ease)}
-.btn.primary{background:var(--green-400);color:#002018;box-shadow:0 8px 20px rgba(0,128,72,.35)}
-.btn.primary:hover{background:var(--green-300);transform:translateY(-1px)}
-.btn:active{transform:scale(.98)}
-.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
-.btn.ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.3);margin-top:12px}
-.btn.ghost:hover{background:rgba(255,255,255,.08)}
+.afield{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.afield label{font:500 13px/1.2 var(--font);color:rgba(255,255,255,.86)}
+.afield input{height:50px;border-radius:var(--r-field);border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:var(--white);padding:0 16px;font:400 15px var(--font);width:100%}
+.afield input::placeholder{color:rgba(255,255,255,.5)}
+.afield input:focus{outline:none;border-color:var(--green-200);box-shadow:0 0 0 3px rgba(88,232,136,.22)}
 .linkrow{display:flex;justify-content:space-between;margin:-4px 0 18px;font:500 13px var(--font)}
 .linkrow button{background:none;border:0;padding:8px 0;color:var(--green-200);font:inherit;cursor:pointer;min-height:44px}
+.auth .foot{padding:0 28px max(28px,env(safe-area-inset-bottom));text-align:center;font:400 12px var(--font);color:rgba(255,255,255,.7)}
 .msg{border-radius:12px;padding:12px 14px;margin:0 0 16px;font:500 13.5px/1.45 var(--font)}
 .msg.err{background:var(--danger-soft);color:#8a1f18}
 .msg.ok{background:var(--green-100);color:#00331f}
-.auth .foot{padding:0 28px max(28px,env(safe-area-inset-bottom));text-align:center;font:400 12px var(--font);color:rgba(255,255,255,.7)}
+.msg.warn{background:var(--warn-soft);color:#6b4600}
+
+/* ---------- botões ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 20px;border-radius:var(--r-field);border:1px solid transparent;font:600 14.5px var(--font);cursor:pointer;transition:transform .12s var(--ease),background .2s var(--ease);text-decoration:none;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn.block{width:100%}
+.btn.primary{background:var(--green-400);color:#002018;box-shadow:0 6px 16px rgba(0,128,72,.25)}
+.btn.primary:hover{background:var(--green-300);transform:translateY(-1px)}
+.btn.sec{background:var(--white);color:var(--navy-900);border-color:var(--n-200)}
+.btn.sec:hover{background:var(--n-100)}
+.btn.danger{background:var(--white);color:var(--danger);border-color:#f2c4c1}
+.btn.danger:hover{background:var(--danger-soft)}
+.btn.sm{height:40px;padding:0 14px;font-size:13px}
+.btn.ghostw{background:transparent;color:var(--white);border-color:rgba(255,255,255,.3)}
+.btn.ghostw:hover{background:rgba(255,255,255,.08)}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--n-200);background:var(--white);color:var(--n-600);display:inline-grid;place-items:center;cursor:pointer;text-decoration:none}
+.iconbtn:hover{background:var(--n-100)}
 
 /* ---------- aplicativo ---------- */
 .top{background:var(--green-900);color:var(--white);padding:max(12px,env(safe-area-inset-top)) 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
-.top button{background:rgba(255,255,255,.1);color:var(--white);border:1px solid rgba(255,255,255,.18);border-radius:10px;height:44px;padding:0 16px;font:500 13px var(--font);cursor:pointer}
-.top button:hover{background:rgba(255,255,255,.16)}
-.wrap{max-width:680px;margin:0 auto;padding:28px 20px 48px}
+.wrap{max-width:720px;margin:0 auto;padding:24px 20px calc(var(--nav-h) + 40px)}
 .wrap h1{font-size:26px;margin-bottom:6px}
-.wrap .lead{margin:0 0 24px;color:var(--n-500)}
-.grid{display:grid;gap:16px}
-.card{background:var(--white);border:1px solid var(--n-200);border-radius:var(--r-card);padding:20px;box-shadow:0 1px 2px rgba(0,16,48,.05)}
-.card .hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
-.card h2{font-size:18px}
-.card p{margin:0;color:var(--n-500)}
-.badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;background:var(--n-100);color:var(--n-500);font:600 11px var(--font);white-space:nowrap}
-.badge.good{background:var(--green-100);color:#006b3c}
 .eyebrow{font:600 11px/1 var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--green-500);margin:0 0 10px}
+.lead{margin:0 0 20px;color:var(--n-500)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.card{background:var(--white);border:1px solid var(--n-200);border-radius:var(--r-card);padding:20px;box-shadow:0 1px 2px rgba(0,16,48,.05);margin-bottom:16px}
+.card h2{font-size:17px;margin-bottom:14px}
+.card p{margin:0 0 10px;color:var(--n-500)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media (max-width:520px){.grid2,.grid3{grid-template-columns:1fr}.grid2.keep{grid-template-columns:1fr 1fr}}
+.f{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;min-width:0}
+.f label{font:500 12.5px/1.2 var(--font);color:var(--n-600)}
+.f input,.f select,.f textarea{height:46px;border-radius:var(--r-field);border:1px solid var(--n-300);background:var(--white);color:var(--n-700);padding:0 14px;font:400 15px var(--font);width:100%}
+.f textarea{height:auto;min-height:84px;padding:12px 14px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:#0090f8;box-shadow:0 0 0 3px rgba(0,144,248,.18)}
+.f .hint{font:400 12px/1.3 var(--font);color:var(--n-500)}
+.search{position:relative;margin-bottom:14px}
+.search input{height:48px;border-radius:var(--r-field);border:1px solid var(--n-300);padding:0 16px 0 44px;width:100%;font:400 15px var(--font);background:var(--white)}
+.search .ic{position:absolute;left:14px;top:14px;color:var(--n-400)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:thin}
+.chip{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--n-300);background:var(--white);color:var(--n-600);font:500 13px var(--font);white-space:nowrap;cursor:pointer;flex:none}
+.chip.on{background:var(--green-500);border-color:var(--green-500);color:var(--white)}
+.list{background:var(--white);border:1px solid var(--n-200);border-radius:var(--r-card);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--n-100);text-decoration:none;color:inherit;cursor:pointer;min-height:64px}
+.item:last-child{border-bottom:0}
+.item:hover{background:var(--n-50)}
+.item .t{font-weight:600;color:var(--navy-900);line-height:1.3;overflow:hidden;text-overflow:ellipsis}
+.item .d{font-size:13px;color:var(--n-500);line-height:1.35}
+.avatar{width:42px;height:42px;border-radius:12px;background:var(--green-100);color:var(--green-500);display:grid;place-items:center;font:700 16px var(--display);flex:none}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;background:var(--n-100);color:var(--n-500);font:600 11px var(--font);white-space:nowrap}
+.badge.good{background:var(--green-100);color:#006b3c}
+.badge.warn{background:var(--warn-soft);color:#7a5200}
+.badge.crit{background:var(--danger-soft);color:#9a2a22}
+.empty{background:var(--white);border:1px dashed var(--n-300);border-radius:var(--r-card);padding:28px 20px;text-align:center}
+.empty p{margin:0 0 16px;color:var(--n-500)}
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin:22px 0 10px}
+.sec-h h2{font-size:16px}
+.ctt{border:1px solid var(--n-200);border-radius:16px;padding:14px;margin-bottom:12px;background:var(--n-50)}
+.ctt .row{margin-bottom:8px}
+.actbar{display:flex;gap:10px;flex-wrap:wrap}
+.nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--white);border-top:1px solid var(--n-200);display:flex;z-index:6}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:var(--n-500);font:500 11px var(--font)}
+.nav a.on{color:var(--green-500)}
+.nav a.off{opacity:.45;pointer-events:none}
+.tblwrap{overflow:auto;border:1px solid var(--n-200);border-radius:16px;background:var(--white)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:var(--n-50);text-align:left;padding:10px 12px;font:600 11px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--n-500);position:sticky;top:0}
+td{padding:10px 12px;border-top:1px solid var(--n-100);vertical-align:top}
+.progress{height:10px;border-radius:999px;background:var(--n-100);overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--green-400);width:0;transition:width .3s var(--ease)}
+.maprow{display:grid;grid-template-columns:1fr 1.2fr;gap:10px;align-items:center;margin-bottom:10px}
+.maprow .f{margin:0}
+.maprow .lab{font:500 13.5px var(--font);color:var(--n-700)}
+.maprow .lab small{display:block;color:var(--n-500);font-weight:400;font-size:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;font:500 14px var(--font);color:var(--n-700)}
+.chk input{width:20px;height:20px;accent-color:var(--green-500)}
+.steps{display:flex;gap:6px;margin:0 0 18px}
+.steps i{flex:1;height:5px;border-radius:999px;background:var(--n-200)}
+.steps i.on{background:var(--green-400)}
+.scrim{position:fixed;inset:0;background:rgba(0,11,33,.6);backdrop-filter:blur(3px);z-index:20;display:grid;place-items:end center}
+.sheet{background:var(--white);border-radius:28px 28px 0 0;width:100%;max-width:560px;padding:22px 20px calc(22px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.sheet h2{font-size:19px;margin-bottom:8px}
+.sheet p{margin:0 0 16px;color:var(--n-500)}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 20px);transform:translateX(-50%);background:var(--navy-900);color:var(--white);padding:12px 18px;border-radius:14px;font:500 13.5px var(--font);z-index:30;max-width:90vw;text-align:center}
 .loading{min-height:100vh;display:grid;place-items:center;background:var(--grad-assist)}
 .loading img{width:56px;height:56px;object-fit:contain;animation:fade .6s var(--ease) both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (min-width:760px){.nav{display:none}.wrap{padding-bottom:48px}.topnav{display:flex!important}.toast{bottom:24px}}
+.topnav{display:none;gap:4px}
+.topnav a{color:rgba(255,255,255,.8);text-decoration:none;font:500 13.5px var(--font);padding:10px 14px;border-radius:10px}
+.topnav a.on,.topnav a:hover{background:rgba(255,255,255,.12);color:var(--white)}
 </style>
 </head>
 <body>
@@ -90,20 +163,15 @@ a{color:var(--green-500)}
 <main id="v-auth" class="auth" hidden>
   <div class="in">
     <div class="lockup"><img class="mk" src="assets/mark-green.png" alt=""><div class="wm"><img src="assets/wordmark-white.png" alt="Banheza"><span>ROTA</span></div></div>
-
     <h1 id="a-title">Entrar</h1>
     <p class="sub" id="a-sub">Acesse com a sua conta.</p>
     <div id="a-msg" class="msg" hidden role="status"></div>
-
     <form id="a-form" novalidate>
-      <div class="field" id="f-nome" hidden><label for="i-nome">Seu nome</label><input id="i-nome" autocomplete="name" placeholder="Como você quer ser chamado"></div>
-      <div class="field" id="f-email"><label for="i-email">E-mail</label><input id="i-email" type="email" autocomplete="email" inputmode="email" placeholder="voce@exemplo.com.br"></div>
-      <div class="field" id="f-senha"><label for="i-senha">Senha</label><input id="i-senha" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres"></div>
-      <div class="linkrow" id="a-links">
-        <button type="button" id="b-mode">Criar conta</button>
-        <button type="button" id="b-forgot">Esqueci a senha</button>
-      </div>
-      <button class="btn primary" id="b-go" type="submit">Entrar</button>
+      <div class="afield" id="f-nome" hidden><label for="i-nome">Seu nome</label><input id="i-nome" autocomplete="name" placeholder="Como você quer ser chamado"></div>
+      <div class="afield" id="f-email"><label for="i-email">E-mail</label><input id="i-email" type="email" autocomplete="email" inputmode="email" placeholder="voce@exemplo.com.br"></div>
+      <div class="afield" id="f-senha"><label for="i-senha">Senha</label><input id="i-senha" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres"></div>
+      <div class="linkrow"><button type="button" id="b-mode">Criar conta</button><button type="button" id="b-forgot">Esqueci a senha</button></div>
+      <button class="btn primary block" id="b-go" type="submit" style="height:52px">Entrar</button>
     </form>
   </div>
   <div class="foot">Seu dia de visitas, no melhor trajeto.</div>
@@ -113,21 +181,10 @@ a{color:var(--green-500)}
 <div id="v-app" hidden>
   <header class="top">
     <div class="lockup sm"><img class="mk" src="assets/mark-green.png" alt=""><div class="wm"><img src="assets/wordmark-white.png" alt="Banheza"><span>ROTA</span></div></div>
-    <button id="b-out" type="button">Sair</button>
+    <nav class="topnav" id="topnav"></nav>
   </header>
-  <div class="wrap">
-    <p class="eyebrow">Início</p>
-    <h1 id="h-ola">Olá.</h1>
-    <p class="lead" id="h-trial"></p>
-    <div class="grid">
-      <section class="card"><div class="hd"><h2>Clientes</h2><span class="badge">Em breve</span></div>
-        <p>Você ainda não tem clientes aqui. Em breve dá para cadastrar e importar a sua carteira por planilha.</p></section>
-      <section class="card"><div class="hd"><h2>Rota do dia</h2><span class="badge">Em breve</span></div>
-        <p>Escolha as visitas do dia e receba a melhor ordem pelas ruas, com a distância e o tempo.</p></section>
-      <section class="card"><div class="hd"><h2>Visitas</h2><span class="badge">Em breve</span></div>
-        <p>Registre a chegada e as anotações de cada visita, e acompanhe o histórico de cada cliente.</p></section>
-    </div>
-  </div>
+  <div class="wrap" id="view"></div>
+  <nav class="nav" id="nav"></nav>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -138,13 +195,108 @@ const SUPABASE_URL="https://cahfugahdvrdpymztyhz.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_aKCOaHv4l8yzx4KDScxnFw_EsFu9ujS";
 const APP_ID="rota";   // vai no cadastro; o banco usa isso para NÃO criar uma empresa do Assist
 
+/* ===================== utilitários ===================== */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const show=id=>["v-load","v-auth","v-app"].forEach(v=>{$("#"+v).hidden=(v!==id);});
+const RE_ACENTOS=new RegExp("["+String.fromCharCode(768)+"-"+String.fromCharCode(879)+"]","g");
+const semAcento=s=>String(s==null?"":s).normalize("NFD").replace(RE_ACENTOS,"").toLowerCase();
+const chave=s=>semAcento(s).replace(/[^a-z0-9]/g,"");
+const dig=s=>String(s==null?"":s).replace(/\D/g,"");
 const fmtData=d=>{try{return new Date(d).toLocaleDateString("pt-BR");}catch(e){return "";}};
+const IC=(n,c)=>`<span class="ic ${c||""}" style="--i:url(https://unpkg.com/lucide-static@0.454.0/icons/${n}.svg)"></span>`;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function fmtDoc(s){const d=dig(s);if(d.length===14)return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,"$1.$2.$3/$4-$5");if(d.length===11)return d.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/,"$1.$2.$3-$4");return String(s||"").trim();}
+function fmtCep(s){const d=dig(s);return d.length===8?d.slice(0,5)+"-"+d.slice(5):String(s||"").trim();}
+function fmtTel(s){let d=dig(s);if(d.length>=12&&d.startsWith("55"))d=d.slice(2);if(d.length===11)return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;if(d.length===10)return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;return String(s||"").trim();}
+const hrefTel=s=>{const d=dig(s);return d?"tel:+55"+(d.startsWith("55")&&d.length>11?d.slice(2):d):"";};
+const hrefWpp=s=>{let d=dig(s);if(d.length>=12&&d.startsWith("55"))d=d.slice(2);return d.length>=10?"https://wa.me/55"+d:"";};
+const ehCelular=s=>{let d=dig(s);if(d.length>=12&&d.startsWith("55"))d=d.slice(2);return d.length===11&&d[2]==="9";};
+const nomeCli=c=>(c.fantasia||c.razao||"").trim();
+const iniciais=c=>(nomeCli(c).replace(/[^A-Za-zÀ-ÿ0-9]/g," ").trim()[0]||"?").toUpperCase();
 
-let supa=null,modo="entrar";   // entrar | criar | nova (definir nova senha)
+function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;e.setAttribute("role","status");document.body.appendChild(e);setTimeout(()=>e.remove(),3200);}
+function sheet(html,onReady){
+  closeSheet();
+  const d=document.createElement("div");d.className="scrim";d.id="scrim";d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+  d.addEventListener("click",e=>{if(e.target===d)closeSheet();});document.body.appendChild(d);
+  onReady&&onReady(d);return d;
+}
+function closeSheet(){const d=$("#scrim");if(d)d.remove();}
+function confirma(titulo,texto,rotulo,fn){
+  sheet(`<h2>${esc(titulo)}</h2><p>${esc(texto)}</p><div class="actbar"><button class="btn sec" id="cn">Cancelar</button><button class="btn danger" id="cs">${esc(rotulo)}</button></div>`,d=>{
+    d.querySelector("#cn").onclick=closeSheet;d.querySelector("#cs").onclick=()=>{closeSheet();fn();};
+  });
+}
 
+/* ===================== CSV / planilha ===================== */
+function lerCSV(texto){
+  texto=String(texto||"");if(texto.charCodeAt(0)===65279)texto=texto.slice(1);
+  const prim=texto.split(/\r?\n/)[0]||"";
+  const sep=[";","\t",","].map(s=>[s,prim.split(s).length]).sort((a,b)=>b[1]-a[1])[0][0];
+  const linhas=[];let cel="",lin=[],asp=false;
+  const fim=()=>{lin.push(cel);cel="";if(lin.some(x=>x.trim()!==""))linhas.push(lin);lin=[];};
+  for(let i=0;i<texto.length;i++){
+    const c=texto[i];
+    if(asp){if(c==='"'){if(texto[i+1]==='"'){cel+='"';i++;}else asp=false;}else cel+=c;}
+    else if(c==='"')asp=true;
+    else if(c===sep){lin.push(cel);cel="";}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&texto[i+1]==="\n")i++;fim();}
+    else cel+=c;
+  }
+  if(cel!==""||lin.length)fim();
+  return linhas;
+}
+function decodifica(buf){
+  try{return new TextDecoder("utf-8",{fatal:true}).decode(buf);}
+  catch(e){return new TextDecoder("windows-1252").decode(buf);}   // planilhas antigas (Excel em português)
+}
+let xlsxP=null;
+function carregaXLSX(){
+  if(window.XLSX)return Promise.resolve(window.XLSX);
+  if(xlsxP)return xlsxP;
+  xlsxP=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=()=>res(window.XLSX);s.onerror=()=>rej(new Error("Não foi possível carregar o leitor de Excel."));document.head.appendChild(s);});
+  return xlsxP;
+}
+async function lerArquivo(file){
+  const buf=await file.arrayBuffer();
+  if(/\.(xlsx|xls)$/i.test(file.name)){
+    const X=await carregaXLSX();const wb=X.read(buf,{type:"array"});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    return X.utils.sheet_to_json(ws,{header:1,raw:false,defval:""}).map(l=>l.map(c=>String(c==null?"":c))).filter(l=>l.some(c=>c.trim()!==""));
+  }
+  return lerCSV(decodifica(buf));
+}
+
+/* ===================== estado e dados ===================== */
+let supa=null;
+const S={perfil:null,reps:[],clientes:[],contatos:[]};
+async function pagina(tabela){
+  const out=[];
+  for(let de=0;;de+=1000){
+    const{data,error}=await supa.from(tabela).select("*").order("id").range(de,de+999);
+    if(error)throw error;out.push(...(data||[]));if(!data||data.length<1000)break;
+  }
+  return out;
+}
+async function carregar(){
+  const[r,c,t]=await Promise.all([pagina("rota_representadas"),pagina("rota_clientes"),pagina("rota_contatos")]);
+  S.reps=r;S.clientes=c;S.contatos=t;
+}
+const cliPorId=id=>S.clientes.find(c=>c.id===id);
+const contatosDe=id=>S.contatos.filter(t=>t.cliente_id===id);
+const repNome=id=>(S.reps.find(r=>r.id===id)||{}).nome||"";
+function erroBanco(e){
+  const m=String((e&&e.message)||e||"");
+  if(/rota_clientes_doc_uk|duplicate key/i.test(m))return "Já existe um cliente com este CNPJ/CPF.";
+  if(/relation .* does not exist|could not find the table|schema cache/i.test(m))return "As tabelas do Rota ainda não foram criadas no banco. Rode o arquivo supabase-rota-clientes.sql.";
+  if(/JWT|not authenticated|permission denied|row-level security/i.test(m))return "Sua sessão expirou. Entre de novo.";
+  if(/network|failed to fetch/i.test(m))return "Sem conexão com a internet. Tente de novo.";
+  return "Não foi possível salvar. Tente de novo.";
+}
+
+/* ===================== autenticação (Etapa 0) ===================== */
+let modoAuth="entrar";   // entrar | criar | nova
+const show=id=>["v-load","v-auth","v-app"].forEach(v=>{$("#"+v).hidden=(v!==id);});
 function aviso(txt,tipo){const m=$("#a-msg");if(!txt){m.hidden=true;return;}m.className="msg "+(tipo||"err");m.textContent=txt;m.hidden=false;}
 function traduz(e){
   const m=String((e&&e.message)||e||"");
@@ -158,12 +310,11 @@ function traduz(e){
   return "Não foi possível concluir. Tente de novo.";
 }
 function telaAuth(m){
-  modo=m;aviso("");
+  modoAuth=m;aviso("");
   const criar=m==="criar",nova=m==="nova";
   $("#a-title").textContent=nova?"Nova senha":criar?"Criar conta":"Entrar";
   $("#a-sub").textContent=nova?"Escolha uma senha nova para a sua conta.":criar?"Teste grátis por 30 dias.":"Acesse com a sua conta.";
-  $("#f-nome").hidden=!criar;
-  $("#f-email").hidden=nova;
+  $("#f-nome").hidden=!criar;$("#f-email").hidden=nova;
   $("#b-go").textContent=nova?"Salvar senha":criar?"Criar conta":"Entrar";
   $("#b-mode").textContent=criar?"Já tenho conta":"Criar conta";
   $("#b-mode").hidden=nova;$("#b-forgot").hidden=(criar||nova);
@@ -171,40 +322,37 @@ function telaAuth(m){
   $("#i-senha").placeholder=nova?"Nova senha (mínimo de 6)":"Mínimo de 6 caracteres";
   show("v-auth");
 }
-
 async function abrirApp(user){
   show("v-load");
   let perfil=null;
   for(let i=0;i<8&&!perfil;i++){   // o perfil nasce por gatilho logo depois do cadastro: pode levar um instante
     const{data}=await supa.from("rota_perfis").select("nome,plano,trial_ate").eq("id",user.id).maybeSingle();
-    perfil=data;if(!perfil)await new Promise(r=>setTimeout(r,400));
+    perfil=data;if(!perfil)await sleep(400);
   }
   if(!perfil){
-    await supa.auth.signOut();
-    telaAuth("entrar");
-    aviso("Esta conta não é do Banheza Rota. Crie uma conta nova aqui, com o mesmo e-mail ou outro.");
-    return;
+    await supa.auth.signOut();telaAuth("entrar");
+    aviso("Esta conta não é do Banheza Rota. Crie uma conta nova aqui, com o mesmo e-mail ou outro.");return;
   }
-  const nome=(perfil.nome||"").split(" ")[0]||"";
-  $("#h-ola").textContent="Olá"+(nome?", "+nome:"")+".";
-  $("#h-trial").textContent=perfil.plano==="trial"&&perfil.trial_ate?"Seu teste grátis vai até "+fmtData(perfil.trial_ate)+".":"";
+  S.perfil=perfil;
+  try{await carregar();}catch(e){S.carregouErro=erroBanco(e);}
   show("v-app");
+  if(!location.hash||location.hash==="#")location.hash="#/inicio";
+  rota();
 }
-
-async function enviar(ev){
+async function enviarAuth(ev){
   ev.preventDefault();aviso("");
   const email=$("#i-email").value.trim(),senha=$("#i-senha").value,nome=$("#i-nome").value.trim();
   const btn=$("#b-go"),rot=btn.textContent;
   try{
-    if(modo!=="nova"&&!/^\S+@\S+\.\S+$/.test(email))return aviso("Digite um e-mail válido.");
+    if(modoAuth!=="nova"&&!/^\S+@\S+\.\S+$/.test(email))return aviso("Digite um e-mail válido.");
     if(!senha||senha.length<6)return aviso("A senha precisa ter pelo menos 6 caracteres.");
     btn.disabled=true;btn.textContent="Aguarde…";
-    if(modo==="nova"){
+    if(modoAuth==="nova"){
       const{error}=await supa.auth.updateUser({password:senha});if(error)throw error;
       const{data}=await supa.auth.getUser();history.replaceState(null,"",location.pathname);
       return abrirApp(data.user);
     }
-    if(modo==="criar"){
+    if(modoAuth==="criar"){
       if(!nome){btn.disabled=false;btn.textContent=rot;return aviso("Digite o seu nome.");}
       const{data,error}=await supa.auth.signUp({email,password:senha,options:{data:{app:APP_ID,nome},emailRedirectTo:location.origin+location.pathname}});
       if(error)throw error;
@@ -217,7 +365,6 @@ async function enviar(ev){
   }catch(e){aviso(traduz(e));}
   finally{btn.disabled=false;if(btn.textContent==="Aguarde…")btn.textContent=rot;}
 }
-
 async function esqueci(){
   aviso("");
   const email=$("#i-email").value.trim();
@@ -229,20 +376,475 @@ async function esqueci(){
   }catch(e){aviso(traduz(e));}
 }
 
+/* ===================== roteador ===================== */
+const NAV=[["inicio","house","Início"],["clientes","users","Clientes"],["rota","route","Rota"],["mais","ellipsis","Mais"]];
+function desenhaNav(atual){
+  const grupo={inicio:"inicio",clientes:"clientes",rota:"rota",mais:"mais",representadas:"mais",importar:"mais"}[atual]||"inicio";
+  $("#nav").innerHTML=NAV.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""} ${k==="rota"?"off":""}" ${k==="rota"?'aria-disabled="true" title="Em breve"':""}>${IC(i)}<span>${t}</span></a>`).join("");
+  $("#topnav").innerHTML=NAV.filter(n=>n[0]!=="rota").map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""}">${t}</a>`).join("")+`<a href="#/importar" class="${atual==="importar"?"on":""}">Importar</a>`;
+}
+function rota(){
+  if(!S.perfil)return;
+  const [r,a]=(location.hash.replace(/^#\/?/,"")||"inicio").split("/");
+  const v=$("#view");window.scrollTo(0,0);
+  desenhaNav(r);
+  const mapa={inicio:telaInicio,clientes:()=>a?telaCliente(v,a):telaClientes(v),representadas:telaReps,importar:telaImportar,mais:telaMais};
+  (mapa[r]||telaInicio)(v);
+}
+window.addEventListener("hashchange",rota);
+
+/* ===================== telas ===================== */
+function telaInicio(v){
+  const nome=(S.perfil.nome||"").split(" ")[0];
+  const trial=S.perfil.plano==="trial"&&S.perfil.trial_ate?"Seu teste grátis vai até "+fmtData(S.perfil.trial_ate)+".":"";
+  const semEnd=S.clientes.filter(c=>c.ativo&&!c.cep&&!c.endereco).length;
+  v.innerHTML=`<p class="eyebrow">Início</p><h1>Olá${nome?", "+esc(nome):""}.</h1><p class="lead">${esc(trial)}</p>
+    ${S.carregouErro?`<div class="msg err">${esc(S.carregouErro)}</div>`:""}
+    <div class="grid2 keep" style="margin-bottom:16px">
+      <div class="card" style="margin:0"><p style="margin:0">Clientes</p><h1 style="margin:4px 0 0">${S.clientes.filter(c=>c.ativo).length}</h1></div>
+      <div class="card" style="margin:0"><p style="margin:0">Representadas</p><h1 style="margin:4px 0 0">${S.reps.length}</h1></div>
+    </div>
+    ${S.clientes.length?"":`<div class="empty"><p>Você ainda não tem clientes. Cadastre o primeiro ou importe a sua carteira por planilha.</p><div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div></div>`}
+    ${semEnd?`<div class="msg warn">${semEnd} cliente${semEnd>1?"s":""} sem endereço. Sem endereço, o cliente não entra na rota do dia.</div>`:""}
+    <div class="card"><h2>Rota do dia</h2><p>Escolha as visitas do dia e receba a melhor ordem pelas ruas, com a distância e o tempo. Em breve.</p></div>`;
+}
+
+function telaMais(v){
+  v.innerHTML=`<p class="eyebrow">Mais</p><h1>Mais opções</h1><p class="lead">${esc(S.perfil.nome||"")}</p>
+    <div class="list">
+      <a class="item" href="#/representadas"><span class="avatar">${IC("building-2")}</span><div class="grow"><div class="t">Representadas</div><div class="d">As empresas que você atende</div></div>${IC("chevron-right","sm")}</a>
+      <a class="item" href="#/importar"><span class="avatar">${IC("file-spreadsheet")}</span><div class="grow"><div class="t">Importar planilha</div><div class="d">Traga clientes do Bling ou de qualquer sistema</div></div>${IC("chevron-right","sm")}</a>
+    </div>
+    <div style="margin-top:20px"><button class="btn sec block" id="sair">Sair</button></div>`;
+  v.querySelector("#sair").onclick=async()=>{await supa.auth.signOut();S.perfil=null;S.clientes=[];S.reps=[];S.contatos=[];telaAuth("entrar");};
+}
+
+/* ---------- representadas ---------- */
+function telaReps(v){
+  v.innerHTML=`<div class="row between"><div><p class="eyebrow">Mais</p><h1>Representadas</h1></div><button class="btn primary sm" id="nova">${IC("plus","sm")} Nova</button></div>
+    <p class="lead">As empresas que você representa. Cada cliente pode ser atendido por mais de uma.</p>
+    ${S.reps.length?`<div class="list">${S.reps.map(r=>`<div class="item" data-id="${esc(r.id)}"><span class="avatar">${esc((r.nome[0]||"?").toUpperCase())}</span><div class="grow"><div class="t">${esc(r.nome)}</div><div class="d">${S.clientes.filter(c=>(c.representadas||[]).includes(r.id)).length} cliente(s)${r.comissao!=null?" · comissão "+String(r.comissao).replace(".",",")+"%":""}</div></div>${IC("chevron-right","sm")}</div>`).join("")}</div>`
+      :`<div class="empty"><p>Nenhuma representada ainda. Cadastre a primeira para vincular os seus clientes.</p></div>`}`;
+  v.querySelector("#nova").onclick=()=>formRep(null);
+  v.querySelectorAll(".item[data-id]").forEach(e=>e.onclick=()=>formRep(S.reps.find(r=>r.id===e.dataset.id)));
+}
+function formRep(r){
+  sheet(`<h2>${r?"Editar representada":"Nova representada"}</h2>
+    <div class="f"><label for="rn">Nome da empresa</label><input id="rn" value="${esc(r?r.nome:"")}" placeholder="Ex.: Indústria Exemplo Ltda"></div>
+    <div class="f"><label for="rc">Comissão (%) — opcional</label><input id="rc" inputmode="decimal" value="${r&&r.comissao!=null?esc(String(r.comissao).replace(".",",")):""}" placeholder="Ex.: 5"></div>
+    <div class="f"><label for="ro">Observações</label><textarea id="ro">${esc(r?r.obs:"")}</textarea></div>
+    <div id="rm"></div>
+    <div class="actbar"><button class="btn primary" id="rs">Salvar</button>${r?'<button class="btn danger" id="rd">Excluir</button>':""}<button class="btn sec" id="rx">Cancelar</button></div>`,d=>{
+    d.querySelector("#rx").onclick=closeSheet;
+    d.querySelector("#rs").onclick=async()=>{
+      const nome=d.querySelector("#rn").value.trim();if(!nome){d.querySelector("#rm").innerHTML='<div class="msg err">Digite o nome da empresa.</div>';return;}
+      const cm=d.querySelector("#rc").value.trim().replace(",",".");const comissao=cm===""?null:Number(cm);
+      if(cm!==""&&!isFinite(comissao)){d.querySelector("#rm").innerHTML='<div class="msg err">Comissão inválida.</div>';return;}
+      const obj={nome,comissao,obs:d.querySelector("#ro").value.trim()};
+      const q=r?supa.from("rota_representadas").update(obj).eq("id",r.id).select().single():supa.from("rota_representadas").insert(obj).select().single();
+      const{data,error}=await q;
+      if(error){d.querySelector("#rm").innerHTML=`<div class="msg err">${esc(erroBanco(error))}</div>`;return;}
+      if(r)Object.assign(r,data);else S.reps.push(data);
+      S.reps.sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR"));closeSheet();toast("Representada salva.");rota();
+    };
+    r&&(d.querySelector("#rd").onclick=()=>confirma("Excluir representada?","Os clientes não são apagados; só deixam de estar vinculados a ela.","Excluir",async()=>{
+      const{error}=await supa.from("rota_representadas").delete().eq("id",r.id);
+      if(error)return toast(erroBanco(error));
+      S.reps=S.reps.filter(x=>x.id!==r.id);toast("Representada excluída.");rota();
+    }));
+  });
+}
+
+/* ---------- lista de clientes ---------- */
+let FILTRO={q:"",rep:""};
+function telaClientes(v){
+  v.innerHTML=`<div class="row between"><div><p class="eyebrow">Carteira</p><h1>Clientes</h1></div><a class="btn primary sm" href="#/clientes/novo">${IC("plus","sm")} Novo</a></div>
+    <div class="search">${IC("search")}<input id="q" type="search" placeholder="Buscar nome, CNPJ ou cidade" value="${esc(FILTRO.q)}" aria-label="Buscar clientes"></div>
+    ${S.reps.length?`<div class="chips" id="chips"><button class="chip ${FILTRO.rep===""?"on":""}" data-r="">Todas</button>${S.reps.map(r=>`<button class="chip ${FILTRO.rep===r.id?"on":""}" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
+    <p class="lead" id="cont" style="margin-bottom:10px"></p><div id="lista"></div>`;
+  const desenha=()=>{
+    const q=semAcento(FILTRO.q).trim();
+    const lista=S.clientes.filter(c=>c.ativo).filter(c=>!FILTRO.rep||(c.representadas||[]).includes(FILTRO.rep)).filter(c=>{
+      if(!q)return true;
+      const t=semAcento([c.razao,c.fantasia,c.cidade,c.bairro,c.segmento,contatosDe(c.id).map(x=>x.nome).join(" ")].join(" "));
+      const td=dig(c.doc);   // o CNPJ pode ser digitado com ou sem pontos
+      return q.split(/\s+/).every(w=>t.includes(w)||(dig(w).length>=3&&td.includes(dig(w))));
+    }).sort((a,b)=>nomeCli(a).localeCompare(nomeCli(b),"pt-BR"));
+    v.querySelector("#cont").textContent=lista.length+(lista.length===1?" cliente":" clientes");
+    v.querySelector("#lista").innerHTML=lista.length?`<div class="list">${lista.slice(0,300).map(c=>{
+      const comp=contatosDe(c.id).find(t=>t.principal)||contatosDe(c.id)[0];
+      const loc=[c.cidade&&(c.cidade+(c.uf?"/"+c.uf:"")),comp&&comp.nome].filter(Boolean).join(" · ");
+      return `<a class="item" href="#/clientes/${esc(c.id)}"><span class="avatar">${esc(iniciais(c))}</span><div class="grow"><div class="t">${esc(nomeCli(c))}</div><div class="d">${esc(loc||"Sem endereço")}</div></div>${!c.cep&&!c.endereco?'<span class="badge warn">sem endereço</span>':""}${IC("chevron-right","sm")}</a>`;
+    }).join("")}</div>${lista.length>300?`<p class="lead" style="margin-top:10px">Mostrando 300 de ${lista.length}. Use a busca para achar os demais.</p>`:""}`
+      :`<div class="empty"><p>${S.clientes.length?"Nenhum cliente encontrado. Tente outra busca.":"Você ainda não tem clientes. Cadastre o primeiro ou importe uma planilha."}</p>${S.clientes.length?"":`<div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div>`}</div>`;
+  };
+  v.querySelector("#q").oninput=e=>{FILTRO.q=e.target.value;desenha();};
+  v.querySelectorAll("#chips .chip").forEach(b=>b.onclick=()=>{FILTRO.rep=b.dataset.r;v.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("on",x===b));desenha();});
+  desenha();
+}
+
+/* ---------- cadastro / edição de cliente ---------- */
+function telaCliente(v,id){
+  const novo=id==="novo";
+  const c=novo?{id:null,razao:"",fantasia:"",doc:"",ie:"",segmento:"",cep:"",endereco:"",numero:"",complemento:"",bairro:"",cidade:"",uf:"",tel:"",celular:"",email:"",site:"",obs:"",horario:"",tempo_visita_min:null,freq_dias:null,representadas:[],origem:"manual",ativo:true}:cliPorId(id);
+  if(!c){v.innerHTML=`<div class="empty"><p>Cliente não encontrado.</p><a class="btn sec" href="#/clientes">Voltar</a></div>`;return;}
+  let ctts=novo?[{_id:"n0",nome:"",cargo:"",tel:"",email:"",principal:true}]:contatosDe(c.id).map(t=>({_id:t.id,...t}));
+  let seq=1;
+  const campo=(k,rot,extra)=>`<div class="f"><label for="c_${k}">${rot}</label><input id="c_${k}" value="${esc(c[k]==null?"":c[k])}" ${extra||""}></div>`;
+  const desenhaCtts=()=>{
+    v.querySelector("#ctts").innerHTML=ctts.map((t,i)=>`<div class="ctt" data-i="${i}">
+      <div class="grid2"><div class="f"><label>Nome</label><input data-f="nome" value="${esc(t.nome)}" placeholder="Ex.: Carlos (comprador)"></div><div class="f"><label>Cargo</label><input data-f="cargo" value="${esc(t.cargo)}" placeholder="Comprador, financeiro…"></div></div>
+      <div class="grid2"><div class="f"><label>Telefone / WhatsApp</label><input data-f="tel" inputmode="tel" value="${esc(t.tel)}"></div><div class="f"><label>E-mail</label><input data-f="email" type="email" value="${esc(t.email)}"></div></div>
+      <div class="row between"><div class="actbar">${hrefTel(t.tel)?`<a class="btn sec sm" href="${hrefTel(t.tel)}">${IC("phone","sm")} Ligar</a>`:""}${hrefWpp(t.tel)?`<a class="btn sec sm" target="_blank" rel="noopener" href="${hrefWpp(t.tel)}">${IC("message-circle","sm")} WhatsApp</a>`:""}</div>
+      <button type="button" class="btn danger sm" data-rm="${i}">${IC("trash-2","sm")} Remover</button></div></div>`).join("")||`<p class="lead">Nenhum contato. Adicione o comprador ou o responsável.</p>`;
+    v.querySelectorAll("#ctts [data-rm]").forEach(b=>b.onclick=()=>{lerCtts();ctts.splice(+b.dataset.rm,1);desenhaCtts();});
+  };
+  const lerCtts=()=>v.querySelectorAll("#ctts .ctt").forEach(el=>{const t=ctts[+el.dataset.i];el.querySelectorAll("[data-f]").forEach(i=>{t[i.dataset.f]=i.value.trim();});});
+  v.innerHTML=`<div class="row between" style="margin-bottom:8px"><a class="iconbtn" href="#/clientes" aria-label="Voltar">${IC("arrow-left")}</a><h1 style="font-size:20px;flex:1;margin:0 12px">${novo?"Novo cliente":esc(nomeCli(c))}</h1></div>
+    <div id="msg"></div>
+    <div class="card"><h2>Empresa</h2>
+      <div class="f"><label for="c_razao">Razão social ou nome</label><input id="c_razao" value="${esc(c.razao)}" autocomplete="off"></div>
+      ${campo("fantasia","Nome fantasia")}
+      <div class="grid2">${campo("doc","CNPJ ou CPF",'inputmode="numeric"')}${campo("segmento","Segmento")}</div>
+      ${campo("ie","Inscrição estadual")}
+    </div>
+    <div class="card"><h2>Endereço</h2>
+      <div class="f"><label for="c_cep">CEP</label><input id="c_cep" inputmode="numeric" maxlength="9" value="${esc(fmtCep(c.cep))}" placeholder="00000-000"><span class="hint" id="cepmsg">Digite o CEP para preencher o endereço.</span></div>
+      <div class="f"><label for="c_endereco">Rua / avenida</label><input id="c_endereco" value="${esc(c.endereco)}"></div>
+      <div class="grid2">${campo("numero","Número")}${campo("complemento","Complemento")}</div>
+      <div class="grid2">${campo("bairro","Bairro")}<div class="grid2 keep"><div class="f"><label for="c_cidade">Cidade</label><input id="c_cidade" value="${esc(c.cidade)}"></div><div class="f"><label for="c_uf">UF</label><input id="c_uf" maxlength="2" value="${esc(c.uf)}"></div></div></div>
+    </div>
+    <div class="card"><h2>Telefones e e-mail da empresa</h2>
+      <div class="grid2">${campo("tel","Telefone",'inputmode="tel"')}${campo("celular","Celular / WhatsApp",'inputmode="tel"')}</div>
+      <div class="grid2">${campo("email","E-mail",'type="email"')}${campo("site","Site")}</div>
+      <div class="actbar">${hrefTel(c.tel||c.celular)?`<a class="btn sec sm" href="${hrefTel(c.celular||c.tel)}">${IC("phone","sm")} Ligar</a>`:""}${hrefWpp(c.celular||c.tel)?`<a class="btn sec sm" target="_blank" rel="noopener" href="${hrefWpp(c.celular||c.tel)}">${IC("message-circle","sm")} WhatsApp</a>`:""}</div>
+    </div>
+    <div class="card"><div class="sec-h" style="margin-top:0"><h2 style="margin:0">Contatos (comprador e outros)</h2><button class="btn sec sm" id="addc" type="button">${IC("plus","sm")} Adicionar</button></div><div id="ctts"></div></div>
+    <div class="card"><h2>Visitas</h2>
+      <div class="f"><label for="c_horario">Dias e horários em que atende</label><input id="c_horario" value="${esc(c.horario)}" placeholder="Ex.: seg a sex, 8h às 17h"></div>
+      <div class="grid2"><div class="f"><label for="c_tempo">Tempo médio de visita (min)</label><input id="c_tempo" inputmode="numeric" value="${c.tempo_visita_min==null?"":esc(c.tempo_visita_min)}"></div><div class="f"><label for="c_freq">Visitar a cada (dias)</label><input id="c_freq" inputmode="numeric" value="${c.freq_dias==null?"":esc(c.freq_dias)}"></div></div>
+    </div>
+    <div class="card"><h2>Representadas que atendem este cliente</h2>
+      ${S.reps.length?S.reps.map(r=>`<label class="chk"><input type="checkbox" data-rep="${esc(r.id)}" ${(c.representadas||[]).includes(r.id)?"checked":""}> ${esc(r.nome)}</label>`).join(""):`<p>Você ainda não cadastrou representadas. <a href="#/representadas">Cadastrar agora</a>.</p>`}
+    </div>
+    <div class="card"><h2>Observações</h2><div class="f" style="margin:0"><textarea id="c_obs">${esc(c.obs)}</textarea></div></div>
+    <div class="actbar"><button class="btn primary" id="salvar">Salvar cliente</button>${novo?"":'<button class="btn danger" id="excluir">Excluir</button>'}<a class="btn sec" href="#/clientes">Cancelar</a></div>`;
+  desenhaCtts();
+  v.querySelector("#addc").onclick=()=>{lerCtts();ctts.push({_id:"n"+(seq++),nome:"",cargo:"",tel:"",email:"",principal:!ctts.length});desenhaCtts();};
+  // busca do endereço pelo CEP (ViaCEP)
+  const cep=v.querySelector("#c_cep"),cm=v.querySelector("#cepmsg");
+  cep.oninput=async()=>{
+    const d=dig(cep.value);if(d.length>5)cep.value=d.slice(0,5)+"-"+d.slice(5,8);
+    if(d.length!==8){cm.textContent="Digite o CEP para preencher o endereço.";return;}
+    cm.textContent="Buscando…";
+    try{
+      const r=await fetch("https://viacep.com.br/ws/"+d+"/json/");const j=await r.json();
+      if(j.erro){cm.textContent="CEP não encontrado. Preencha o endereço à mão.";return;}
+      const set=(id,val)=>{const e=v.querySelector(id);if(e&&!e.value.trim()&&val)e.value=val;};
+      set("#c_endereco",j.logradouro);set("#c_bairro",j.bairro);set("#c_cidade",j.localidade);set("#c_uf",j.uf);
+      cm.textContent="Endereço preenchido. Confira e informe o número.";v.querySelector("#c_numero").focus();
+    }catch(e){cm.textContent="Não foi possível buscar o CEP agora. Preencha o endereço à mão.";}
+  };
+  v.querySelector("#salvar").onclick=async()=>{
+    lerCtts();
+    const g=k=>v.querySelector("#c_"+k).value.trim();
+    const msg=t=>{v.querySelector("#msg").innerHTML=`<div class="msg err">${esc(t)}</div>`;window.scrollTo(0,0);};
+    if(!g("razao"))return msg("Digite a razão social ou o nome do cliente.");
+    const doc=dig(g("doc"));
+    if(doc&&doc.length!==11&&doc.length!==14)return msg("O CNPJ tem 14 números e o CPF tem 11. Confira o que foi digitado.");
+    const dup=doc&&S.clientes.find(x=>x.doc===doc&&x.id!==c.id);
+    if(dup)return msg("Já existe um cliente com este CNPJ/CPF: "+nomeCli(dup)+".");
+    const num=k=>{const t=g(k);return t===""?null:Math.max(0,parseInt(t,10)||0);};
+    const obj={razao:g("razao"),fantasia:g("fantasia"),doc,ie:g("ie"),segmento:g("segmento"),cep:dig(g("cep")),endereco:g("endereco"),numero:g("numero"),complemento:g("complemento"),bairro:g("bairro"),cidade:g("cidade"),uf:g("uf").toUpperCase(),
+      tel:g("tel"),celular:g("celular"),email:g("email"),site:g("site"),obs:v.querySelector("#c_obs").value.trim(),horario:g("horario"),tempo_visita_min:num("tempo"),freq_dias:num("freq"),
+      representadas:[...v.querySelectorAll("[data-rep]")].filter(i=>i.checked).map(i=>i.dataset.rep),atualizado_em:new Date().toISOString()};
+    // se o endereço mudou, o ponto no mapa antigo deixa de valer
+    if(!novo&&(obj.cep!==(c.cep||"")||obj.endereco!==c.endereco||obj.numero!==c.numero||obj.cidade!==c.cidade)){obj.lat=null;obj.lng=null;}
+    const b=v.querySelector("#salvar");b.disabled=true;b.textContent="Salvando…";
+    try{
+      const q=novo?supa.from("rota_clientes").insert({...obj,origem:"manual"}).select().single():supa.from("rota_clientes").update(obj).eq("id",c.id).select().single();
+      const{data,error}=await q;if(error)throw error;
+      const cid=data.id;
+      // contatos: apaga os removidos, atualiza os existentes, cria os novos
+      const manter=ctts.filter(t=>t.nome||t.tel||t.email||t.cargo);
+      const antigos=novo?[]:contatosDe(cid);
+      const remover=antigos.filter(a=>!manter.some(t=>t._id===a.id)).map(a=>a.id);
+      if(remover.length){const{error:e1}=await supa.from("rota_contatos").delete().in("id",remover);if(e1)throw e1;}
+      const mantidos=[];
+      for(const t of manter){
+        const campos={nome:t.nome,cargo:t.cargo,tel:t.tel,email:t.email,principal:false};
+        if(antigos.some(a=>a.id===t._id)){const{data:u,error:e2}=await supa.from("rota_contatos").update(campos).eq("id",t._id).select().single();if(e2)throw e2;mantidos.push(u);}
+        else{const{data:n,error:e3}=await supa.from("rota_contatos").insert({...campos,cliente_id:cid}).select().single();if(e3)throw e3;mantidos.push(n);}
+      }
+      S.contatos=S.contatos.filter(t=>t.cliente_id!==cid).concat(mantidos);
+      if(novo)S.clientes.push(data);else Object.assign(c,data);
+      toast("Cliente salvo.");location.hash="#/clientes";
+    }catch(e){msg(erroBanco(e));b.disabled=false;b.textContent="Salvar cliente";}
+  };
+  const ex=v.querySelector("#excluir");
+  ex&&(ex.onclick=()=>confirma("Excluir cliente?","Os contatos deste cliente também serão apagados. Isso não pode ser desfeito.","Excluir",async()=>{
+    const{error}=await supa.from("rota_clientes").delete().eq("id",c.id);
+    if(error)return toast(erroBanco(error));
+    S.clientes=S.clientes.filter(x=>x.id!==c.id);S.contatos=S.contatos.filter(t=>t.cliente_id!==c.id);
+    toast("Cliente excluído.");location.hash="#/clientes";
+  }));
+}
+
+/* ===================== importação de planilha ===================== */
+const CAMPOS=[
+  {k:"razao",t:"Razão social ou nome",req:1,syn:["nome","razao social","razao","empresa","nome da empresa","cliente","nome do cliente"]},
+  {k:"fantasia",t:"Nome fantasia",syn:["fantasia","nome fantasia"]},
+  {k:"doc",t:"CNPJ ou CPF",syn:["cnpj / cpf","cnpj/cpf","cnpj","cpf","cpf/cnpj","cpf / cnpj","documento","cnpj cpf"]},
+  {k:"ie",t:"Inscrição estadual",syn:["ie / rg","ie","inscricao estadual"]},
+  {k:"segmento",t:"Segmento",syn:["segmento","ramo","ramo de atividade"]},
+  {k:"cep",t:"CEP",syn:["cep"]},
+  {k:"endereco",t:"Endereço (rua)",syn:["endereco","logradouro","rua"]},
+  {k:"numero",t:"Número",syn:["numero","nro","num"]},
+  {k:"complemento",t:"Complemento",syn:["complemento","compl"]},
+  {k:"bairro",t:"Bairro",syn:["bairro"]},
+  {k:"cidade",t:"Cidade",syn:["cidade","municipio"]},
+  {k:"uf",t:"UF",syn:["uf","estado"]},
+  {k:"tel",t:"Telefone",syn:["fone","telefone","tel","telefone fixo"]},
+  {k:"celular",t:"Celular / WhatsApp",syn:["celular","whatsapp","movel","cel"]},
+  {k:"email",t:"E-mail",syn:["e-mail","email"]},
+  {k:"site",t:"Site",syn:["web site","site","website"]},
+  {k:"contato",t:"Nome do comprador / contato",syn:["contatos","contato","comprador","responsavel","nome do contato"]},
+  {k:"obs",t:"Observações",syn:["observacoes","observacao","obs"]},
+  {k:"tipo",t:"Tipo de contato (cliente / fornecedor)",filtro:1,syn:["tipo contato","tipo de contato","tipo"]},
+  {k:"vendedor",t:"Vendedor / representante",filtro:1,syn:["vendedor","representante"]},
+  {k:"situacao",t:"Situação (ativo / inativo)",filtro:1,syn:["situacao","status"]},
+  {k:"id_externo",t:"Código no sistema de origem",syn:["id","codigo","cod"]}
+];
+let IMP=null;
+
+function chaveCab(h){return semAcento(h).replace(/\s+/g," ").trim();}
+function adivinhar(cab){
+  const map={},usado=new Set(),norm=cab.map(chaveCab);
+  const salvo=(()=>{try{return JSON.parse(localStorage.getItem("rota_map_"+norm.join("|"))||"null");}catch(e){return null;}})();
+  if(salvo){for(const k in salvo){if(salvo[k]>=0&&salvo[k]<cab.length)map[k]=salvo[k];}return{map,salvo:true};}
+  for(const f of CAMPOS){
+    const i=norm.findIndex((h,ix)=>!usado.has(ix)&&f.syn.includes(h));
+    if(i>=0){map[f.k]=i;usado.add(i);}
+  }
+  return{map,salvo:false};
+}
+function limpaEndereco(o){
+  let rua=String(o.endereco||"").trim().replace(/[,\s]+$/,"").replace(/\s{2,}/g," ");
+  let num=String(o.numero||"").trim().replace(/\s{2,}/g," "),comp=String(o.complemento||"").trim();
+  const m=/^(.*?),\s*(\d+[A-Za-z]?)$/.exec(rua);
+  if(m){
+    if(!num||/^s\/?n$/i.test(num)||!/^\d/.test(num)){ if(num&&!/^s\/?n$/i.test(num))comp=(comp+" "+num).trim(); num=m[2]; }
+    rua=m[1].trim();
+  }
+  if(/^s\/?n$/i.test(num))num="S/N";
+  o.endereco=rua;o.numero=num;o.complemento=comp;
+  return o;
+}
+function normalizaLinha(l,map,tipoLimpo){
+  const g=k=>map[k]==null?"":String(l[map[k]]==null?"":l[map[k]]).replace(/\s+\n/g,"\n").trim();
+  const o={razao:g("razao"),fantasia:g("fantasia"),doc:dig(g("doc")),ie:g("ie"),segmento:g("segmento"),cep:dig(g("cep")),endereco:g("endereco"),numero:g("numero"),complemento:g("complemento"),bairro:g("bairro"),
+    cidade:g("cidade"),uf:g("uf").toUpperCase().slice(0,2),tel:fmtTel(g("tel")),celular:fmtTel(g("celular")),email:g("email"),site:g("site"),obs:g("obs"),id_externo:g("id_externo")};
+  if(o.cep.length!==8)o.cep=o.cep.length===7?"0"+o.cep:o.cep;
+  if(o.doc&&o.doc.length!==11&&o.doc.length!==14){ if(o.doc.length===13)o.doc="0"+o.doc; else if(o.doc.length===10)o.doc="0"+o.doc; }
+  if(o.fantasia&&chave(o.fantasia)===chave(o.razao))o.fantasia="";
+  limpaEndereco(o);
+  o._contato=g("contato");o._tipo=g("tipo");o._vendedor=g("vendedor");o._situacao=g("situacao");
+  return o;
+}
+const chaveNomeCidade=o=>chave(o.razao)+"|"+chave(o.cidade);
+
+function telaImportar(v){
+  if(!IMP||IMP.fim)IMP={passo:1,fim:false};
+  const passos=()=>`<div class="steps">${[1,2,3,4].map(n=>`<i class="${n<=IMP.passo?"on":""}"></i>`).join("")}</div>`;
+  const cab=()=>`<div class="row between"><div><p class="eyebrow">Importar planilha</p><h1>${["","Escolher o arquivo","Conferir as colunas","Conferir os clientes","Importando"][IMP.passo]}</h1></div></div>${passos()}`;
+
+  if(IMP.passo===1){
+    v.innerHTML=cab()+`<p class="lead">Traga a sua carteira de clientes de qualquer sistema. Aceitamos arquivos <b>CSV</b> e <b>Excel</b> (.xlsx). No Bling: Cadastros → Contatos → Exportar.</p>
+      <div id="msg"></div>
+      <label class="btn primary block" for="arq" style="height:56px">${IC("upload")} Escolher arquivo</label>
+      <input type="file" id="arq" accept=".csv,.txt,.xlsx,.xls,text/csv" hidden>
+      <p class="lead" style="margin-top:16px">Seus dados ficam só na sua conta. Antes de gravar, você confere tudo.</p>`;
+    v.querySelector("#arq").onchange=async e=>{
+      const f=e.target.files[0];if(!f)return;
+      if(f.size>8*1024*1024)return v.querySelector("#msg").innerHTML='<div class="msg err">Arquivo muito grande (máximo de 8 MB).</div>';
+      try{
+        const linhas=await lerArquivo(f);
+        if(linhas.length<2)return v.querySelector("#msg").innerHTML='<div class="msg err">A planilha está vazia ou só tem o cabeçalho.</div>';
+        const cabecalho=linhas[0].map(x=>String(x||"").trim());
+        const{map,salvo}=adivinhar(cabecalho);
+        IMP={passo:2,fim:false,nome:f.name,cab:cabecalho,linhas:linhas.slice(1),map,salvo,
+             bling:cabecalho.map(chaveCab).includes("tipo contato")&&cabecalho.map(chaveCab).includes("cliente desde"),
+             repId:S.reps.length===1?S.reps[0].id:"",novaRep:"",tipos:null,vendedor:"",soAtivos:true};
+        telaImportar(v);
+      }catch(err){v.querySelector("#msg").innerHTML=`<div class="msg err">${esc(err.message||"Não foi possível ler o arquivo.")}</div>`;}
+    };
+    return;
+  }
+
+  if(IMP.passo===2){
+    const col=(k)=>IMP.map[k]==null?[]:IMP.linhas.map(l=>String(l[IMP.map[k]]||"").trim());
+    const contar=a=>{const m=new Map();a.forEach(x=>m.set(x,(m.get(x)||0)+1));return[...m.entries()].sort((p,q)=>q[1]-p[1]);};
+    const tipos=contar(col("tipo").map(x=>x||"(sem tipo)")),vends=contar(col("vendedor").filter(Boolean)),sits=contar(col("situacao").filter(Boolean));
+    if(IMP.tipos==null)IMP.tipos=new Set(tipos.map(t=>t[0]).filter(n=>!/fornec/i.test(n)));
+    const opcoesCol=`<option value="">— não usar —</option>`+IMP.cab.map((h,i)=>`<option value="${i}">${esc(h||"(coluna "+(i+1)+")")}</option>`).join("");
+    v.innerHTML=cab()+`<p class="lead">Arquivo: <b>${esc(IMP.nome)}</b> · ${IMP.linhas.length} linha(s).${IMP.bling?" Planilha do Bling reconhecida.":""}${IMP.salvo?" Usando as colunas que você escolheu da última vez.":""}</p>
+      <div id="msg"></div>
+      <div class="card"><h2>Para qual representada?</h2>
+        <div class="f"><label for="repsel">Representada</label><select id="repsel"><option value="">Nenhuma (só adicionar à carteira)</option>${S.reps.map(r=>`<option value="${esc(r.id)}" ${IMP.repId===r.id?"selected":""}>${esc(r.nome)}</option>`).join("")}<option value="__nova">+ Criar nova representada…</option></select></div>
+        <div class="f" id="novarep" ${IMP.repId==="__nova"?"":"hidden"}><label for="nrep">Nome da nova representada</label><input id="nrep" value="${esc(IMP.novaRep)}"></div>
+      </div>
+      <div class="card"><h2>Quem entra na importação</h2>
+        ${IMP.map.tipo!=null?`<p>Tipo de contato</p>${tipos.map(([n,q])=>`<label class="chk"><input type="checkbox" data-tipo="${esc(n)}" ${IMP.tipos.has(n)?"checked":""}> ${esc(n)} <span class="badge">${q}</span></label>`).join("")}`:""}
+        ${IMP.map.vendedor!=null&&vends.length?`<div class="f" style="margin-top:10px"><label for="vend">Vendedor</label><select id="vend"><option value="">Todos os vendedores</option>${vends.map(([n,q])=>`<option value="${esc(n)}" ${IMP.vendedor===n?"selected":""}>${esc(n)} (${q})</option>`).join("")}</select></div>`:""}
+        ${IMP.map.situacao!=null&&sits.length?`<label class="chk"><input type="checkbox" id="soat" ${IMP.soAtivos?"checked":""}> Somente cadastros ativos</label>`:""}
+        ${IMP.map.tipo==null&&IMP.map.vendedor==null&&IMP.map.situacao==null?`<p>Todas as linhas serão conferidas na próxima etapa.</p>`:""}
+      </div>
+      <div class="card"><h2>Colunas da planilha</h2><p>Confira se cada informação está ligada à coluna certa.</p>
+        ${CAMPOS.map(f=>`<div class="maprow"><div class="lab">${esc(f.t)}${f.req?" *":""}</div><div class="f"><select data-campo="${f.k}" aria-label="${esc(f.t)}">${opcoesCol}</select></div></div>`).join("")}
+      </div>
+      <div class="actbar"><button class="btn primary" id="seg">Conferir clientes</button><button class="btn sec" id="vol">Escolher outro arquivo</button></div>`;
+    v.querySelectorAll("select[data-campo]").forEach(s=>{s.value=IMP.map[s.dataset.campo]==null?"":String(IMP.map[s.dataset.campo]);s.onchange=()=>{if(s.value==="")delete IMP.map[s.dataset.campo];else IMP.map[s.dataset.campo]=+s.value;IMP.tipos=null;IMP.salvo=false;};});
+    v.querySelector("#repsel").onchange=e=>{IMP.repId=e.target.value;v.querySelector("#novarep").hidden=IMP.repId!=="__nova";};
+    v.querySelector("#nrep").oninput=e=>{IMP.novaRep=e.target.value;};
+    v.querySelectorAll("[data-tipo]").forEach(c=>c.onchange=()=>{c.checked?IMP.tipos.add(c.dataset.tipo):IMP.tipos.delete(c.dataset.tipo);});
+    v.querySelector("#vend")&&(v.querySelector("#vend").onchange=e=>{IMP.vendedor=e.target.value;});
+    v.querySelector("#soat")&&(v.querySelector("#soat").onchange=e=>{IMP.soAtivos=e.target.checked;});
+    v.querySelector("#vol").onclick=()=>{IMP=null;telaImportar(v);};
+    v.querySelector("#seg").onclick=()=>{
+      if(IMP.map.razao==null)return v.querySelector("#msg").innerHTML='<div class="msg err">Escolha a coluna do nome do cliente (razão social).</div>',window.scrollTo(0,0);
+      if(IMP.repId==="__nova"&&!IMP.novaRep.trim())return v.querySelector("#msg").innerHTML='<div class="msg err">Digite o nome da nova representada ou escolha outra opção.</div>',window.scrollTo(0,0);
+      try{localStorage.setItem("rota_map_"+IMP.cab.map(chaveCab).join("|"),JSON.stringify(IMP.map));}catch(e){}
+      montaPrevia();IMP.passo=3;telaImportar(v);
+    };
+    return;
+  }
+
+  if(IMP.passo===3){
+    const P=IMP.previa,cont={novo:0,existe:0,repetido:0,erro:0};
+    P.forEach(r=>{cont[r.estado==="semnome"?"erro":r.estado]=(cont[r.estado==="semnome"?"erro":r.estado]||0)+1;});
+    const ROT={novo:["good","Novo"],existe:["","Já existe — completa os dados"],repetido:["warn","Repetido na planilha"],semnome:["crit","Sem nome"]};
+    const marc=()=>P.filter(r=>r.marcado).length;
+    v.innerHTML=cab()+`<p class="lead"><b>${P.length}</b> cliente(s) para conferir: ${cont.novo} novo(s), ${cont.existe} já cadastrado(s)${cont.repetido?`, ${cont.repetido} repetido(s)`:""}${cont.erro?`, ${cont.erro} sem nome`:""}. Desmarque o que não quiser importar.</p>
+      <div class="tblwrap" style="max-height:56vh"><table><thead><tr><th></th><th>Cliente</th><th>Cidade</th><th>Situação</th></tr></thead><tbody>
+      ${P.map((r,i)=>`<tr><td><input type="checkbox" data-r="${i}" style="width:20px;height:20px" ${r.marcado?"checked":""} ${r.estado==="semnome"||r.estado==="repetido"?"disabled":""} aria-label="Importar ${esc(r.o.razao)}"></td>
+        <td><b>${esc(r.o.fantasia||r.o.razao)}</b>${r.o.fantasia?`<div class="d" style="color:var(--n-500)">${esc(r.o.razao)}</div>`:""}<div class="d" style="color:var(--n-500)">${esc(fmtDoc(r.o.doc))}${r.o._contato?" · "+esc(r.o._contato):""}</div></td>
+        <td>${esc(r.o.cidade)}${r.o.uf?"/"+esc(r.o.uf):""}</td>
+        <td><span class="badge ${ROT[r.estado][0]}">${ROT[r.estado][1]}</span>${!r.o.cep&&!r.o.endereco&&r.estado!=="semnome"?' <span class="badge warn">sem endereço</span>':""}</td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="actbar" style="margin-top:16px"><button class="btn primary" id="go"></button><button class="btn sec" id="vol">Voltar</button></div>`;
+    const atual=()=>{const n=marc(),b=v.querySelector("#go");b.textContent=n?`Importar ${n} cliente${n>1?"s":""}`:"Nada para importar";b.disabled=!n;};
+    v.querySelectorAll("[data-r]").forEach(c=>c.onchange=()=>{P[+c.dataset.r].marcado=c.checked;atual();});
+    v.querySelector("#vol").onclick=()=>{IMP.passo=2;telaImportar(v);};
+    v.querySelector("#go").onclick=()=>{IMP.passo=4;telaImportar(v);executaImportacao(v);};
+    atual();return;
+  }
+
+  if(IMP.passo===4){
+    v.innerHTML=cab()+`<div class="card"><p id="stt">Preparando…</p><div class="progress"><i id="bar"></i></div></div><div id="res"></div>`;
+  }
+}
+
+function montaPrevia(){
+  const tipoSel=IMP.tipos;
+  const existentesDoc=new Map(S.clientes.filter(c=>c.doc).map(c=>[c.doc,c]));
+  const existentesNome=new Map(S.clientes.filter(c=>!c.doc).map(c=>[chaveNomeCidade(c),c]));
+  const vistos=new Set(),out=[];
+  for(const l of IMP.linhas){
+    const o=normalizaLinha(l,IMP.map);
+    if(IMP.map.tipo!=null&&!tipoSel.has(o._tipo||"(sem tipo)"))continue;
+    if(IMP.vendedor&&o._vendedor!==IMP.vendedor)continue;
+    if(IMP.soAtivos&&IMP.map.situacao!=null&&o._situacao&&!/^ativ/i.test(o._situacao))continue;
+    let estado="novo",ex=null;
+    if(!o.razao)estado="semnome";
+    else{
+      const k=o.doc||chaveNomeCidade(o);
+      if(vistos.has(k))estado="repetido";
+      vistos.add(k);
+      if(estado==="novo"){ex=(o.doc&&existentesDoc.get(o.doc))||(!o.doc&&existentesNome.get(chaveNomeCidade(o)))||null;if(ex)estado="existe";}
+    }
+    out.push({o,estado,ex,marcado:estado==="novo"||estado==="existe"});
+  }
+  IMP.previa=out;
+}
+
+async function executaImportacao(v){
+  const stt=v.querySelector("#stt"),bar=v.querySelector("#bar"),res=v.querySelector("#res");
+  const set=(t,p)=>{stt.textContent=t;bar.style.width=Math.round(p*100)+"%";};
+  const sel=IMP.previa.filter(r=>r.marcado);
+  let falhas=0,novos=0,atualizados=0,contatosNovos=0;
+  try{
+    // representada (cria se for nova)
+    let repId=IMP.repId==="__nova"?"":IMP.repId;
+    if(IMP.repId==="__nova"){
+      const{data,error}=await supa.from("rota_representadas").insert({nome:IMP.novaRep.trim()}).select().single();
+      if(error)throw error;S.reps.push(data);repId=data.id;
+    }
+    const camposBase=["razao","fantasia","doc","ie","segmento","cep","endereco","numero","complemento","bairro","cidade","uf","tel","celular","email","site","obs","id_externo"];
+    const novosRows=sel.filter(r=>r.estado==="novo"),exist=sel.filter(r=>r.estado==="existe");
+    const total=novosRows.length+exist.length;let feito=0;
+    const origem=IMP.bling?"bling":"planilha";
+    // 1) clientes novos, em lotes
+    for(let i=0;i<novosRows.length;i+=100){
+      const lote=novosRows.slice(i,i+100);
+      const rows=lote.map(r=>{const x={};camposBase.forEach(k=>x[k]=r.o[k]||"");x.representadas=repId?[repId]:[];x.origem=origem;return x;});
+      const{data,error}=await supa.from("rota_clientes").insert(rows).select();
+      if(error){
+        // se algum lote falhar (ex.: CNPJ repetido), tenta um a um para não perder o resto
+        for(let j=0;j<rows.length;j++){
+          const{data:d1,error:e1}=await supa.from("rota_clientes").insert(rows[j]).select().single();
+          if(e1){falhas++;continue;}
+          S.clientes.push(d1);novos++;lote[j].novoId=d1.id;
+        }
+      }else{data.forEach((d,j)=>{S.clientes.push(d);lote[j].novoId=d.id;});novos+=data.length;}
+      feito+=lote.length;set(`Cadastrando clientes… ${feito} de ${total}`,feito/total*0.8);
+    }
+    // 2) contatos (comprador) dos clientes novos
+    const cts=[];
+    novosRows.forEach(r=>{if(r.novoId&&r.o._contato)cts.push({cliente_id:r.novoId,nome:r.o._contato,tel:r.o.celular||r.o.tel,email:r.o.email,principal:true});});
+    for(let i=0;i<cts.length;i+=200){
+      const{data,error}=await supa.from("rota_contatos").insert(cts.slice(i,i+200)).select();
+      if(error){falhas+=cts.slice(i,i+200).length;continue;}
+      S.contatos.push(...data);contatosNovos+=data.length;
+    }
+    set("Atualizando clientes que já existiam…",0.85);
+    // 3) já existentes: completa campos vazios e acrescenta a representada
+    for(const r of exist){
+      const c=r.ex,upd={};
+      camposBase.forEach(k=>{if(!String(c[k]||"").trim()&&String(r.o[k]||"").trim())upd[k]=r.o[k];});
+      if(repId&&!(c.representadas||[]).includes(repId))upd.representadas=[...(c.representadas||[]),repId];
+      if(Object.keys(upd).length){
+        upd.atualizado_em=new Date().toISOString();
+        const{data,error}=await supa.from("rota_clientes").update(upd).eq("id",c.id).select().single();
+        if(error){falhas++;continue;}Object.assign(c,data);atualizados++;
+      }
+      feito++;
+    }
+    set("Pronto.",1);
+    IMP.fim=true;
+    res.innerHTML=`<div class="msg ${falhas?"warn":"ok"}">${novos} cliente(s) novo(s), ${atualizados} atualizado(s), ${contatosNovos} contato(s) criado(s).${falhas?` ${falhas} não puderam ser gravados (veja se há CNPJ repetido).`:""}</div>
+      <div class="actbar"><a class="btn primary" href="#/clientes">Ver clientes</a><button class="btn sec" id="outra">Importar outra planilha</button></div>`;
+    res.querySelector("#outra").onclick=()=>{IMP=null;telaImportar(v);};
+  }catch(e){
+    set("Não foi possível terminar.",0);
+    res.innerHTML=`<div class="msg err">${esc(erroBanco(e))} O que já foi gravado antes do erro continua salvo; você pode importar de novo — quem já existe não duplica.</div><div class="actbar"><button class="btn sec" id="vol3">Voltar</button></div>`;
+    res.querySelector("#vol3").onclick=()=>{IMP.passo=3;telaImportar(v);};
+  }
+}
+
+/* ===================== inicialização ===================== */
 async function iniciar(){
   if(!window.supabase){telaAuth("entrar");return aviso("Não foi possível carregar o aplicativo. Verifique a internet e recarregue a página.");}
   supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  $("#a-form").addEventListener("submit",enviar);
-  $("#b-mode").onclick=()=>telaAuth(modo==="criar"?"entrar":"criar");
+  $("#a-form").addEventListener("submit",enviarAuth);
+  $("#b-mode").onclick=()=>telaAuth(modoAuth==="criar"?"entrar":"criar");
   $("#b-forgot").onclick=esqueci;
-  $("#b-out").onclick=async()=>{await supa.auth.signOut();telaAuth("entrar");};
   supa.auth.onAuthStateChange(ev=>{if(ev==="PASSWORD_RECOVERY")telaAuth("nova");});
   // veio do link "esqueci a senha": mostra a tela de senha nova em vez de abrir o app
   if(/type=recovery/.test(location.hash+location.search)){telaAuth("nova");return;}
   const{data}=await supa.auth.getSession();
   if(data&&data.session)abrirApp(data.session.user);else telaAuth("entrar");
 }
-iniciar();
+if(!window.__ROTA_TESTE)iniciar();
 </script>
 </body>
 </html>

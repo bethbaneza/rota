@@ -48,3 +48,23 @@ Supabase → **Authentication → URL Configuration**:
 2. Deve aparecer "Olá, <seu nome>." e a data de fim do teste grátis.
 3. No SQL Editor do Supabase, confirme que **não** nasceu empresa nova no Assist:
    `select count(*) from empresas;` — o número não pode aumentar com o cadastro do Rota.
+
+---
+
+# Etapa 1 — Clientes, representadas e importação de planilha
+
+## Rodar o SQL das tabelas
+
+1. Supabase → **SQL Editor → New query**.
+2. Abra `supabase-rota-clientes.sql`, **Ctrl+A, Ctrl+C**, cole e clique em **Run**.
+3. No fim aparecem 3 linhas (rota_representadas, rota_clientes, rota_contatos). As três precisam dizer **ok**.
+
+(Rode **depois** do `supabase-rota-base.sql`.)
+
+## Como usar
+
+- **Clientes → Novo:** cadastro completo (empresa, endereço pelo CEP, contatos/comprador, horários, representadas).
+- **Mais → Representadas:** cadastre as empresas que você representa.
+- **Mais → Importar planilha:** escolha o arquivo (CSV ou Excel). O app reconhece a planilha do Bling,
+  liga as colunas sozinho, deixa de fora os **fornecedores** e mostra tudo para você conferir antes de gravar.
+  Importar o mesmo arquivo de novo **não duplica** (o CNPJ/CPF identifica o cliente).
