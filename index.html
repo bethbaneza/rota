@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#002820">
+<meta name="description" content="Banheza Rota — cadastro de clientes e o melhor trajeto para as suas visitas.">
+<title>Banheza Rota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;600;700&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+:root{
+  /* tokens da marca Banheza (design system) — identidade verde, como o Assist */
+  --green-900:#002820;--green-800:#003020;--green-700:#003828;--green-500:#008048;--green-400:#00c868;--green-300:#3ed87f;--green-200:#58e888;--green-100:#d5f7e3;
+  --navy-900:#001030;
+  --white:#fff;--n-50:#f5f7fa;--n-100:#e9edf3;--n-200:#d6dde7;--n-400:#8a97a8;--n-500:#5d6a7e;--n-700:#2a3247;
+  --danger:#e2453c;--danger-soft:#fdeceb;--warn:#f2a71b;
+  --grad-assist:linear-gradient(180deg,var(--green-900) 0%,var(--green-700) 55%,var(--green-500) 100%);
+  --display:"Exo 2",system-ui,sans-serif;--font:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r-field:14px;--r-card:20px;--ease:cubic-bezier(.2,.6,.2,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--n-50);color:var(--n-700);font:400 15px/1.55 var(--font);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.2;letter-spacing:-.01em;color:var(--navy-900);margin:0;text-wrap:balance}
+[hidden]{display:none!important}
+a{color:var(--green-500)}
+:focus-visible{outline:3px solid rgba(0,144,248,.35);outline-offset:2px}
+
+/* logotipo: símbolo + wordmark oficiais + palavra-produto */
+.lockup{display:flex;align-items:center;gap:12px}
+.lockup img.mk{width:40px;height:40px;object-fit:contain}
+.lockup .wm{display:flex;flex-direction:column;align-items:flex-end;line-height:1}
+.lockup .wm img{height:15px;width:auto;display:block}
+.lockup .wm span{font:600 9.5px/1 var(--display);letter-spacing:.34em;margin-right:-.34em;color:var(--green-200);margin-top:6px}
+.lockup.sm img.mk{width:30px;height:30px}.lockup.sm .wm img{height:12px}.lockup.sm .wm span{font-size:8px;margin-top:5px}
+
+/* ---------- login ---------- */
+.auth{min-height:100vh;min-height:100dvh;background:var(--grad-assist);color:var(--white);display:flex;flex-direction:column}
+.auth .in{width:100%;max-width:440px;margin:0 auto;padding:max(56px,env(safe-area-inset-top)) 28px 24px;flex:1}
+.auth .lockup{margin-bottom:44px}
+.auth h1{color:var(--white);font-size:26px;margin-bottom:6px}
+.auth .sub{margin:0 0 26px;color:rgba(255,255,255,.74)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field label{font:500 13px/1.2 var(--font);color:rgba(255,255,255,.86)}
+.field input{height:50px;border-radius:var(--r-field);border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:var(--white);padding:0 16px;font:400 15px var(--font);width:100%}
+.field input::placeholder{color:rgba(255,255,255,.5)}
+.field input:focus{outline:none;border-color:var(--green-200);box-shadow:0 0 0 3px rgba(88,232,136,.22)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 22px;border-radius:var(--r-field);border:0;font:600 15px var(--font);cursor:pointer;width:100%;transition:transform .12s var(--ease),background .2s var(--ease)}
+.btn.primary{background:var(--green-400);color:#002018;box-shadow:0 8px 20px rgba(0,128,72,.35)}
+.btn.primary:hover{background:var(--green-300);transform:translateY(-1px)}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.3);margin-top:12px}
+.btn.ghost:hover{background:rgba(255,255,255,.08)}
+.linkrow{display:flex;justify-content:space-between;margin:-4px 0 18px;font:500 13px var(--font)}
+.linkrow button{background:none;border:0;padding:8px 0;color:var(--green-200);font:inherit;cursor:pointer;min-height:44px}
+.msg{border-radius:12px;padding:12px 14px;margin:0 0 16px;font:500 13.5px/1.45 var(--font)}
+.msg.err{background:var(--danger-soft);color:#8a1f18}
+.msg.ok{background:var(--green-100);color:#00331f}
+.auth .foot{padding:0 28px max(28px,env(safe-area-inset-bottom));text-align:center;font:400 12px var(--font);color:rgba(255,255,255,.7)}
+
+/* ---------- aplicativo ---------- */
+.top{background:var(--green-900);color:var(--white);padding:max(12px,env(safe-area-inset-top)) 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.top button{background:rgba(255,255,255,.1);color:var(--white);border:1px solid rgba(255,255,255,.18);border-radius:10px;height:44px;padding:0 16px;font:500 13px var(--font);cursor:pointer}
+.top button:hover{background:rgba(255,255,255,.16)}
+.wrap{max-width:680px;margin:0 auto;padding:28px 20px 48px}
+.wrap h1{font-size:26px;margin-bottom:6px}
+.wrap .lead{margin:0 0 24px;color:var(--n-500)}
+.grid{display:grid;gap:16px}
+.card{background:var(--white);border:1px solid var(--n-200);border-radius:var(--r-card);padding:20px;box-shadow:0 1px 2px rgba(0,16,48,.05)}
+.card .hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.card h2{font-size:18px}
+.card p{margin:0;color:var(--n-500)}
+.badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;background:var(--n-100);color:var(--n-500);font:600 11px var(--font);white-space:nowrap}
+.badge.good{background:var(--green-100);color:#006b3c}
+.eyebrow{font:600 11px/1 var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--green-500);margin:0 0 10px}
+.loading{min-height:100vh;display:grid;place-items:center;background:var(--grad-assist)}
+.loading img{width:56px;height:56px;object-fit:contain;animation:fade .6s var(--ease) both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="v-load" class="loading"><img src="assets/mark-green.png" alt="Banheza Rota"></div>
+
+<!-- ENTRAR / CRIAR CONTA / NOVA SENHA -->
+<main id="v-auth" class="auth" hidden>
+  <div class="in">
+    <div class="lockup"><img class="mk" src="assets/mark-green.png" alt=""><div class="wm"><img src="assets/wordmark-white.png" alt="Banheza"><span>ROTA</span></div></div>
+
+    <h1 id="a-title">Entrar</h1>
+    <p class="sub" id="a-sub">Acesse com a sua conta.</p>
+    <div id="a-msg" class="msg" hidden role="status"></div>
+
+    <form id="a-form" novalidate>
+      <div class="field" id="f-nome" hidden><label for="i-nome">Seu nome</label><input id="i-nome" autocomplete="name" placeholder="Como você quer ser chamado"></div>
+      <div class="field" id="f-email"><label for="i-email">E-mail</label><input id="i-email" type="email" autocomplete="email" inputmode="email" placeholder="voce@exemplo.com.br"></div>
+      <div class="field" id="f-senha"><label for="i-senha">Senha</label><input id="i-senha" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres"></div>
+      <div class="linkrow" id="a-links">
+        <button type="button" id="b-mode">Criar conta</button>
+        <button type="button" id="b-forgot">Esqueci a senha</button>
+      </div>
+      <button class="btn primary" id="b-go" type="submit">Entrar</button>
+    </form>
+  </div>
+  <div class="foot">Seu dia de visitas, no melhor trajeto.</div>
+</main>
+
+<!-- APLICATIVO -->
+<div id="v-app" hidden>
+  <header class="top">
+    <div class="lockup sm"><img class="mk" src="assets/mark-green.png" alt=""><div class="wm"><img src="assets/wordmark-white.png" alt="Banheza"><span>ROTA</span></div></div>
+    <button id="b-out" type="button">Sair</button>
+  </header>
+  <div class="wrap">
+    <p class="eyebrow">Início</p>
+    <h1 id="h-ola">Olá.</h1>
+    <p class="lead" id="h-trial"></p>
+    <div class="grid">
+      <section class="card"><div class="hd"><h2>Clientes</h2><span class="badge">Em breve</span></div>
+        <p>Você ainda não tem clientes aqui. Em breve dá para cadastrar e importar a sua carteira por planilha.</p></section>
+      <section class="card"><div class="hd"><h2>Rota do dia</h2><span class="badge">Em breve</span></div>
+        <p>Escolha as visitas do dia e receba a melhor ordem pelas ruas, com a distância e o tempo.</p></section>
+      <section class="card"><div class="hd"><h2>Visitas</h2><span class="badge">Em breve</span></div>
+        <p>Registre a chegada e as anotações de cada visita, e acompanhe o histórico de cada cliente.</p></section>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+"use strict";
+/* Chaves públicas do projeto (a "publishable" é feita para ficar no navegador; a segurança está nas regras do banco). */
+const SUPABASE_URL="https://cahfugahdvrdpymztyhz.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_aKCOaHv4l8yzx4KDScxnFw_EsFu9ujS";
+const APP_ID="rota";   // vai no cadastro; o banco usa isso para NÃO criar uma empresa do Assist
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const show=id=>["v-load","v-auth","v-app"].forEach(v=>{$("#"+v).hidden=(v!==id);});
+const fmtData=d=>{try{return new Date(d).toLocaleDateString("pt-BR");}catch(e){return "";}};
+
+let supa=null,modo="entrar";   // entrar | criar | nova (definir nova senha)
+
+function aviso(txt,tipo){const m=$("#a-msg");if(!txt){m.hidden=true;return;}m.className="msg "+(tipo||"err");m.textContent=txt;m.hidden=false;}
+function traduz(e){
+  const m=String((e&&e.message)||e||"");
+  if(/invalid login/i.test(m))return "E-mail ou senha incorretos.";
+  if(/already registered|already been registered/i.test(m))return "Este e-mail já tem conta. Use Entrar.";
+  if(/password should be at least|weak/i.test(m))return "A senha precisa ter pelo menos 6 caracteres.";
+  if(/rate limit|too many/i.test(m))return "Muitas tentativas. Espere alguns minutos e tente de novo.";
+  if(/email not confirmed/i.test(m))return "Confirme o seu e-mail pelo link que enviamos e depois entre.";
+  if(/invalid email|unable to validate email/i.test(m))return "Confira o e-mail digitado.";
+  if(/network|failed to fetch/i.test(m))return "Sem conexão com a internet. Tente de novo.";
+  return "Não foi possível concluir. Tente de novo.";
+}
+function telaAuth(m){
+  modo=m;aviso("");
+  const criar=m==="criar",nova=m==="nova";
+  $("#a-title").textContent=nova?"Nova senha":criar?"Criar conta":"Entrar";
+  $("#a-sub").textContent=nova?"Escolha uma senha nova para a sua conta.":criar?"Teste grátis por 30 dias.":"Acesse com a sua conta.";
+  $("#f-nome").hidden=!criar;
+  $("#f-email").hidden=nova;
+  $("#b-go").textContent=nova?"Salvar senha":criar?"Criar conta":"Entrar";
+  $("#b-mode").textContent=criar?"Já tenho conta":"Criar conta";
+  $("#b-mode").hidden=nova;$("#b-forgot").hidden=(criar||nova);
+  $("#i-senha").autocomplete=(criar||nova)?"new-password":"current-password";
+  $("#i-senha").placeholder=nova?"Nova senha (mínimo de 6)":"Mínimo de 6 caracteres";
+  show("v-auth");
+}
+
+async function abrirApp(user){
+  show("v-load");
+  let perfil=null;
+  for(let i=0;i<8&&!perfil;i++){   // o perfil nasce por gatilho logo depois do cadastro: pode levar um instante
+    const{data}=await supa.from("rota_perfis").select("nome,plano,trial_ate").eq("id",user.id).maybeSingle();
+    perfil=data;if(!perfil)await new Promise(r=>setTimeout(r,400));
+  }
+  if(!perfil){
+    await supa.auth.signOut();
+    telaAuth("entrar");
+    aviso("Esta conta não é do Banheza Rota. Crie uma conta nova aqui, com o mesmo e-mail ou outro.");
+    return;
+  }
+  const nome=(perfil.nome||"").split(" ")[0]||"";
+  $("#h-ola").textContent="Olá"+(nome?", "+nome:"")+".";
+  $("#h-trial").textContent=perfil.plano==="trial"&&perfil.trial_ate?"Seu teste grátis vai até "+fmtData(perfil.trial_ate)+".":"";
+  show("v-app");
+}
+
+async function enviar(ev){
+  ev.preventDefault();aviso("");
+  const email=$("#i-email").value.trim(),senha=$("#i-senha").value,nome=$("#i-nome").value.trim();
+  const btn=$("#b-go"),rot=btn.textContent;
+  try{
+    if(modo!=="nova"&&!/^\S+@\S+\.\S+$/.test(email))return aviso("Digite um e-mail válido.");
+    if(!senha||senha.length<6)return aviso("A senha precisa ter pelo menos 6 caracteres.");
+    btn.disabled=true;btn.textContent="Aguarde…";
+    if(modo==="nova"){
+      const{error}=await supa.auth.updateUser({password:senha});if(error)throw error;
+      const{data}=await supa.auth.getUser();history.replaceState(null,"",location.pathname);
+      return abrirApp(data.user);
+    }
+    if(modo==="criar"){
+      if(!nome){btn.disabled=false;btn.textContent=rot;return aviso("Digite o seu nome.");}
+      const{data,error}=await supa.auth.signUp({email,password:senha,options:{data:{app:APP_ID,nome},emailRedirectTo:location.origin+location.pathname}});
+      if(error)throw error;
+      if(data.session)return abrirApp(data.user);
+      return aviso("Enviamos um link de confirmação para "+email+". Abra o e-mail e depois entre.","ok");
+    }
+    const{data,error}=await supa.auth.signInWithPassword({email,password:senha});
+    if(error)throw error;
+    return abrirApp(data.user);
+  }catch(e){aviso(traduz(e));}
+  finally{btn.disabled=false;if(btn.textContent==="Aguarde…")btn.textContent=rot;}
+}
+
+async function esqueci(){
+  aviso("");
+  const email=$("#i-email").value.trim();
+  if(!/^\S+@\S+\.\S+$/.test(email))return aviso("Digite o seu e-mail acima e toque em Esqueci a senha de novo.");
+  try{
+    const{error}=await supa.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+    if(error)throw error;
+    aviso("Se esse e-mail tiver conta, enviamos um link para criar uma senha nova.","ok");
+  }catch(e){aviso(traduz(e));}
+}
+
+async function iniciar(){
+  if(!window.supabase){telaAuth("entrar");return aviso("Não foi possível carregar o aplicativo. Verifique a internet e recarregue a página.");}
+  supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  $("#a-form").addEventListener("submit",enviar);
+  $("#b-mode").onclick=()=>telaAuth(modo==="criar"?"entrar":"criar");
+  $("#b-forgot").onclick=esqueci;
+  $("#b-out").onclick=async()=>{await supa.auth.signOut();telaAuth("entrar");};
+  supa.auth.onAuthStateChange(ev=>{if(ev==="PASSWORD_RECOVERY")telaAuth("nova");});
+  // veio do link "esqueci a senha": mostra a tela de senha nova em vez de abrir o app
+  if(/type=recovery/.test(location.hash+location.search)){telaAuth("nova");return;}
+  const{data}=await supa.auth.getSession();
+  if(data&&data.session)abrirApp(data.session.user);else telaAuth("entrar");
+}
+iniciar();
+</script>
+</body>
+</html>
