@@ -771,8 +771,10 @@ async function executaImportacao(v){
   const stt=v.querySelector("#stt"),bar=v.querySelector("#bar"),res=v.querySelector("#res");
   const set=(t,p)=>{stt.textContent=t;bar.style.width=Math.round(p*100)+"%";};
   const sel=IMP.previa.filter(r=>r.marcado);
-  let falhas=0,novos=0,atualizados=0,contatosNovos=0;
+  let falhas=0,novos=0,atualizados=0,contatosNovos=0,motivo="";
+  const guardaMotivo=e=>{if(!motivo&&e)motivo=String(e.message||e).slice(0,240);};
   try{
+    {const{error:e0}=await supa.from("rota_clientes").select("id").range(0,0);if(e0)throw e0;}   // as tabelas existem?
     // representada (cria se for nova)
     let repId=IMP.repId==="__nova"?"":IMP.repId;
     if(IMP.repId==="__nova"){
@@ -792,7 +794,7 @@ async function executaImportacao(v){
         // se algum lote falhar (ex.: CNPJ repetido), tenta um a um para não perder o resto
         for(let j=0;j<rows.length;j++){
           const{data:d1,error:e1}=await supa.from("rota_clientes").insert(rows[j]).select().single();
-          if(e1){falhas++;continue;}
+          if(e1){falhas++;guardaMotivo(e1);continue;}
           S.clientes.push(d1);novos++;lote[j].novoId=d1.id;
         }
       }else{data.forEach((d,j)=>{S.clientes.push(d);lote[j].novoId=d.id;});novos+=data.length;}
@@ -803,7 +805,7 @@ async function executaImportacao(v){
     novosRows.forEach(r=>{if(r.novoId&&r.o._contato)cts.push({cliente_id:r.novoId,nome:r.o._contato,tel:r.o.celular||r.o.tel,email:r.o.email,principal:true});});
     for(let i=0;i<cts.length;i+=200){
       const{data,error}=await supa.from("rota_contatos").insert(cts.slice(i,i+200)).select();
-      if(error){falhas+=cts.slice(i,i+200).length;continue;}
+      if(error){falhas+=cts.slice(i,i+200).length;guardaMotivo(error);continue;}
       S.contatos.push(...data);contatosNovos+=data.length;
     }
     set("Atualizando clientes que já existiam…",0.85);
@@ -815,13 +817,13 @@ async function executaImportacao(v){
       if(Object.keys(upd).length){
         upd.atualizado_em=new Date().toISOString();
         const{data,error}=await supa.from("rota_clientes").update(upd).eq("id",c.id).select().single();
-        if(error){falhas++;continue;}Object.assign(c,data);atualizados++;
+        if(error){falhas++;guardaMotivo(error);continue;}Object.assign(c,data);atualizados++;
       }
       feito++;
     }
     set("Pronto.",1);
     IMP.fim=true;
-    res.innerHTML=`<div class="msg ${falhas?"warn":"ok"}">${novos} cliente(s) novo(s), ${atualizados} atualizado(s), ${contatosNovos} contato(s) criado(s).${falhas?` ${falhas} não puderam ser gravados (veja se há CNPJ repetido).`:""}</div>
+    res.innerHTML=`<div class="msg ${falhas?"warn":"ok"}">${novos} cliente(s) novo(s), ${atualizados} atualizado(s), ${contatosNovos} contato(s) criado(s).${falhas?` ${falhas} não puderam ser gravados.`:""}${motivo?`<br><small>Motivo: ${esc(motivo)}</small>`:""}</div>
       <div class="actbar"><a class="btn primary" href="#/clientes">Ver clientes</a><button class="btn sec" id="outra">Importar outra planilha</button></div>`;
     res.querySelector("#outra").onclick=()=>{IMP=null;telaImportar(v);};
   }catch(e){
