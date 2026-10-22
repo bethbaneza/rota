@@ -234,6 +234,25 @@ td{padding:10px 12px;border-top:1px solid var(--n-100);vertical-align:top}
 .tbl-click tbody tr:hover{background:var(--n-50)}
 .tbl-click td,.tbl-click th{padding:12px 14px}
 .search{max-width:560px}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(90px,210px) 1fr auto;gap:10px;align-items:center;font-size:13px}
+.bar .bl{color:var(--n-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .bt{height:12px;border-radius:999px;background:var(--n-100);overflow:hidden}
+.bar .bt i{display:block;height:100%;background:var(--green-400);border-radius:999px}
+.bar .bv{font:700 13px var(--font);color:var(--navy-900);min-width:34px;text-align:right}
+.bar .bv small{font-weight:400;color:var(--n-500)}
+.relfil{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));align-items:end}
+.relfil .f{margin:0}
+.relcab{margin:0 0 12px;font:600 14px var(--font);color:var(--n-600)}
+.onlyprint{display:none}
+@media print{
+  .side,.nav,.top,.noprint,.toast,.scrim{display:none!important}
+  .main{margin:0!important}.wrap{padding:0!important}
+  body{background:#fff}.onlyprint{display:block}
+  .card,.tblwrap{box-shadow:none!important}
+  .kpis4{grid-template-columns:repeat(4,1fr)!important}.dash{grid-template-columns:repeat(2,1fr)!important}
+}
+
 .mapbox{height:340px}
 @media (min-width:900px){.mapbox{height:420px}}
 </style>
@@ -472,9 +491,9 @@ async function esqueci(){
 /* ===================== roteador ===================== */
 // menu principal (celular: barra de baixo; computador: menu lateral)
 const NAV_MOB=[["inicio","house","Início"],["agenda","calendar-days","Agenda"],["clientes","users","Clientes"],["rota","route","Rota"],["mais","ellipsis","Mais"]];
-const NAV_SIDE=[["inicio","house","Início"],["agenda","calendar-days","Agenda"],["clientes","users","Clientes"],["rota","route","Rota do dia"],["mapa","map-pin","Mapa"],["-"],["representadas","building-2","Representadas"],["importar","file-spreadsheet","Importar planilha"],["casa","settings","Minha casa"]];
+const NAV_SIDE=[["inicio","house","Início"],["agenda","calendar-days","Agenda"],["clientes","users","Clientes"],["rota","route","Rota do dia"],["mapa","map-pin","Mapa"],["relatorios","chart-column","Relatórios"],["-"],["representadas","building-2","Representadas"],["importar","file-spreadsheet","Importar planilha"],["casa","settings","Minha casa"]];
 function desenhaNav(atual){
-  const grupoMob={inicio:"inicio",agenda:"agenda",clientes:"clientes",mapa:"clientes",rota:"rota",mais:"mais",representadas:"mais",importar:"mais",casa:"mais"}[atual]||"inicio";
+  const grupoMob={inicio:"inicio",agenda:"agenda",clientes:"clientes",mapa:"clientes",rota:"rota",mais:"mais",representadas:"mais",importar:"mais",casa:"mais",relatorios:"mais"}[atual]||"inicio";
   $("#nav").innerHTML=NAV_MOB.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupoMob?"on":""}">${IC(i)}<span>${t}</span></a>`).join("");
   $("#sidenav").innerHTML=NAV_SIDE.map(([k,i,t])=>k==="-"?'<div class="sep"></div>':`<a href="#/${k}" class="${k===atual?"on":""}">${IC(i)}<span>${t}</span></a>`).join("");
   $("#who-nome").textContent=S.perfil?(S.perfil.nome||""):"";
@@ -484,7 +503,7 @@ function rota(){
   const [r,a]=(location.hash.replace(/^#\/?/,"")||"inicio").split("/");
   const v=$("#view");window.scrollTo(0,0);
   desenhaNav(r);
-  const mapa={inicio:telaInicio,agenda:telaAgenda,clientes:()=>a?telaCliente(v,a):telaClientes(v),mapa:telaMapa,rota:telaRota,casa:telaCasa,representadas:telaReps,importar:telaImportar,mais:telaMais};
+  const mapa={inicio:telaInicio,agenda:telaAgenda,clientes:()=>a?telaCliente(v,a):telaClientes(v),mapa:telaMapa,relatorios:telaRelatorios,rota:telaRota,casa:telaCasa,representadas:telaReps,importar:telaImportar,mais:telaMais};
   (mapa[r]||telaInicio)(v);
 }
 window.addEventListener("hashchange",rota);
@@ -539,6 +558,7 @@ function telaInicio(v){
 function telaMais(v){
   v.innerHTML=`<p class="eyebrow">Mais</p><h1>Mais opções</h1><p class="lead">${esc(S.perfil.nome||"")}</p>
     <div class="list">
+      <a class="item" href="#/relatorios"><span class="avatar">${IC("chart-column")}</span><div class="grow"><div class="t">Relatórios</div><div class="d">Visitas por empresa, mês, semana e cliente</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/mapa"><span class="avatar">${IC("map-pin")}</span><div class="grow"><div class="t">Mapa dos clientes</div><div class="d">Veja a carteira no mapa</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/casa"><span class="avatar">${IC("house")}</span><div class="grow"><div class="t">Minha casa e visitas</div><div class="d">${S.perfil.casa_lat!=null?"Ponto de saída definido":"Defina o seu ponto de saída"} · visita padrão de ${S.perfil.visita_padrao_min||45} min</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/representadas"><span class="avatar">${IC("building-2")}</span><div class="grow"><div class="t">Representadas</div><div class="d">As empresas que você atende</div></div>${IC("chevron-right","sm")}</a>
@@ -1584,6 +1604,142 @@ async function mostraResultado(v){
   else if(ll.length>1){const linha=res.voltar&&res.casa&&res.casa.lat!=null?[...ll,ll[0]]:ll;L.polyline(linha,{color:"#0090f8",weight:3,opacity:.7,dashArray:"6 8"}).addTo(m);}
   if(ll.length)m.fitBounds(L.latLngBounds(ll).pad(0.2),{maxZoom:15});
   setTimeout(()=>m.invalidateSize(),200);
+}
+
+/* ===================== relatórios ===================== */
+const REL={per:"mes",de:"",ate:"",rep:"",st:"realizada",aba:"resumo",csv:null};
+const MESES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const segundaDe=iso=>{const d=new Date(iso+"T12:00:00");return somaDias(iso,-((d.getDay()+6)%7));};
+function periodoRel(){
+  const hoje=hojeISO(),[Y,M]=hoje.split("-").map(Number);
+  const fimMes=(y,m)=>isoLocal(new Date(y,m,0));
+  switch(REL.per){
+    case"semana":{const s=segundaDe(hoje);return[s,somaDias(s,6),"Esta semana"];}
+    case"semana_ant":{const s=somaDias(segundaDe(hoje),-7);return[s,somaDias(s,6),"Semana passada"];}
+    case"mes":return[`${Y}-${String(M).padStart(2,"0")}-01`,fimMes(Y,M),"Este mês"];
+    case"mes_ant":{const d=new Date(Y,M-2,1);return[isoLocal(d),fimMes(d.getFullYear(),d.getMonth()+1),"Mês passado"];}
+    case"30":return[somaDias(hoje,-29),hoje,"Últimos 30 dias"];
+    case"90":return[somaDias(hoje,-89),hoje,"Últimos 90 dias"];
+    case"ano":return[`${Y}-01-01`,`${Y}-12-31`,"Este ano"];
+    case"tudo":{const ds=S.visitas.map(x=>x.data).sort();return[ds[0]||hoje,ds[ds.length-1]||hoje,"Todo o período"];}
+    default:{const de=REL.de||hoje,ate=REL.ate||hoje;return[de<=ate?de:ate,de<=ate?ate:de,"Período escolhido"];}
+  }
+}
+const rotMes=k=>{const[a,m]=k.split("-");return MESES[+m-1].slice(0,3)+"/"+a.slice(2);};
+const nomeRepVis=x=>(x.representadas||[]).map(repNome).filter(Boolean);
+const eh=(x,s)=>x.status===s;
+const pedido=x=>x.status==="realizada"&&x.resultado==="Pedido fechado";
+
+function dadosRel(){
+  const[de,ate,rotulo]=periodoRel();
+  const base=S.visitas.filter(x=>x.data>=de&&x.data<=ate&&(!REL.rep||(x.representadas||[]).includes(REL.rep)));
+  const vis=REL.st==="todas"?base:base.filter(x=>x.status===REL.st);
+  return{de,ate,rotulo,base,vis};
+}
+const distintos=l=>new Set(l.map(x=>x.cliente_id)).size;
+function resumoDe(l){
+  const r=l.filter(x=>eh(x,"realizada")),c=l.filter(x=>eh(x,"cancelada")),a=l.filter(x=>eh(x,"agendada")),p=r.filter(pedido);
+  return{total:l.length,real:r.length,canc:c.length,agend:a.length,pedidos:p.length,neg:r.filter(x=>x.resultado==="Pedido em negociação").length,clientes:distintos(r),min:r.reduce((s,x)=>s+(x.duracao_min||0),0)};
+}
+const pct=(a,b)=>b?Math.round(a/b*100)+"%":"—";
+
+function barras(itens,max){
+  const m=max||Math.max(1,...itens.map(i=>i[1]));
+  return `<div class="bars">${itens.map(([rot,val,extra])=>`<div class="bar"><span class="bl">${esc(rot)}</span><span class="bt"><i style="width:${Math.round(val/m*100)}%"></i></span><span class="bv">${val}${extra?` <small>${esc(extra)}</small>`:""}</span></div>`).join("")}</div>`;
+}
+function tabelaRel(cols,linhas,nome){
+  REL.csv={nome,cols,linhas};
+  return `<div class="tblwrap"><table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${linhas.length?linhas.map(l=>`<tr>${l.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join(""):`<tr><td colspan="${cols.length}" style="color:var(--n-500)">Nenhuma visita neste período.</td></tr>`}</tbody></table></div>`;
+}
+
+function telaRelatorios(v){
+  const d=dadosRel();
+  const ABAS=[["resumo","Resumo"],["empresa","Por empresa"],["mes","Por mês"],["semana","Por semana"],["cliente","Por cliente"],["lista","Visitas (lista)"]];
+  const opt=(val,rot)=>`<option value="${val}" ${REL.per===val?"selected":""}>${rot}</option>`;
+  v.innerHTML=`<div class="ph noprint"><div><p class="eyebrow">Relatórios</p><h1>Relatórios de visitas</h1></div><div class="actbar"><button class="btn sec" id="rcsv">${IC("download","sm")} Exportar planilha</button><button class="btn sec" id="rimp">${IC("printer","sm")} Imprimir / PDF</button></div></div>
+    ${S.semVisitas?`<div class="msg warn">A agenda ainda não foi ativada no banco. Rode o arquivo <b>supabase-rota-etapa3.sql</b>.</div>`:""}
+    <div class="card noprint"><div class="relfil">
+      <div class="f"><label for="rf_per">Período</label><select id="rf_per">${opt("semana","Esta semana")}${opt("semana_ant","Semana passada")}${opt("mes","Este mês")}${opt("mes_ant","Mês passado")}${opt("30","Últimos 30 dias")}${opt("90","Últimos 90 dias")}${opt("ano","Este ano")}${opt("tudo","Todo o período")}${opt("custom","Escolher datas…")}</select></div>
+      <div class="f" id="rf_dts" ${REL.per==="custom"?"":"hidden"}><label>De / até</label><div class="row" style="flex-wrap:nowrap"><input type="date" id="rf_de" value="${esc(REL.de||d.de)}"><input type="date" id="rf_ate" value="${esc(REL.ate||d.ate)}"></div></div>
+      <div class="f"><label for="rf_rep">Empresa representada</label><select id="rf_rep"><option value="">Todas as empresas</option>${S.reps.map(r=>`<option value="${esc(r.id)}" ${REL.rep===r.id?"selected":""}>${esc(r.nome)}</option>`).join("")}</select></div>
+      <div class="f"><label for="rf_st">Situação das visitas</label><select id="rf_st"><option value="realizada" ${REL.st==="realizada"?"selected":""}>Somente realizadas</option><option value="todas" ${REL.st==="todas"?"selected":""}>Todas (inclui agendadas e canceladas)</option><option value="agendada" ${REL.st==="agendada"?"selected":""}>Somente agendadas</option><option value="cancelada" ${REL.st==="cancelada"?"selected":""}>Somente canceladas</option></select></div>
+    </div></div>
+    <h1 class="onlyprint" style="margin-bottom:6px">Banheza Rota · Relatório de visitas</h1>
+    <div class="relcab">${esc(d.rotulo)}: ${esc(dataCurta(d.de))}${d.de.slice(0,4)!==d.ate.slice(0,4)?"/"+d.de.slice(0,4):""} a ${esc(dataCurta(d.ate))}/${esc(d.ate.slice(0,4))}${REL.rep?" · "+esc(repNome(REL.rep)):" · todas as empresas"}</div>
+    <div class="tabs noprint">${ABAS.map(([k,t])=>`<button class="chip ${REL.aba===k?"on":""}" data-a="${k}">${t}</button>`).join("")}</div>
+    <div id="relcorpo"></div>`;
+  const q=s=>v.querySelector(s);
+  const redesenha=()=>telaRelatorios(v);
+  q("#rf_per").onchange=e=>{REL.per=e.target.value;redesenha();};
+  q("#rf_de")&&(q("#rf_de").onchange=e=>{REL.de=e.target.value;redesenha();});
+  q("#rf_ate")&&(q("#rf_ate").onchange=e=>{REL.ate=e.target.value;redesenha();});
+  q("#rf_rep").onchange=e=>{REL.rep=e.target.value;redesenha();};
+  q("#rf_st").onchange=e=>{REL.st=e.target.value;redesenha();};
+  v.querySelectorAll(".tabs [data-a]").forEach(b=>b.onclick=()=>{REL.aba=b.dataset.a;redesenha();});
+  q("#rimp").onclick=()=>window.print();
+  q("#rcsv").onclick=()=>exportaRel();
+  corpoRel(q("#relcorpo"),d);
+}
+
+function corpoRel(box,d){
+  const{vis,base}=d,R_=resumoDe(vis);
+  let html="";
+  if(REL.aba==="resumo"){
+    const todas=resumoDe(base);
+    const porRes={};vis.filter(x=>eh(x,"realizada")).forEach(x=>{const k=x.resultado||"Sem resultado";porRes[k]=(porRes[k]||0)+1;});
+    const meses={};vis.forEach(x=>{const k=x.data.slice(0,7);meses[k]=(meses[k]||0)+1;});
+    const ordM=Object.keys(meses).sort();
+    const porRep={};vis.forEach(x=>{const n=nomeRepVis(x);(n.length?n:["Sem empresa"]).forEach(k=>{porRep[k]=(porRep[k]||0)+1;});});
+    html=`<div class="kpis4"><div class="kpi"><b>${REL.st==="realizada"?R_.real:R_.total}</b><span>${REL.st==="realizada"?"Visitas realizadas":"Visitas no período"}</span></div><div class="kpi"><b>${R_.clientes}</b><span>Clientes diferentes visitados</span></div><div class="kpi"><b>${R_.pedidos}</b><span>Pedidos fechados</span></div><div class="kpi"><b>${pct(R_.pedidos,R_.real)}</b><span>Pedidos por visita realizada</span></div></div>
+      <div class="kpis4"><div class="kpi"><b>${todas.real}</b><span>Realizadas (todas as empresas do filtro)</span></div><div class="kpi"><b>${todas.agend}</b><span>Ainda agendadas</span></div><div class="kpi"><b>${todas.canc}</b><span>Canceladas</span></div><div class="kpi"><b>${pct(todas.real,todas.real+todas.canc)}</b><span>Realizadas entre realizadas + canceladas</span></div></div>
+      <div class="dash">
+        <section class="card"><h2>Resultado das visitas realizadas</h2>${Object.keys(porRes).length?barras(Object.entries(porRes).sort((a,b)=>b[1]-a[1])):`<p style="margin:0">Nenhuma visita realizada no período.</p>`}</section>
+        <section class="card"><h2>Por empresa</h2>${Object.keys(porRep).length?barras(Object.entries(porRep).sort((a,b)=>b[1]-a[1])):`<p style="margin:0">Sem dados no período.</p>`}<p class="lead" style="margin:10px 0 0;font-size:12px">Uma visita em nome de duas empresas conta nas duas linhas.</p></section>
+      </div>
+      ${ordM.length>1?`<section class="card" style="margin-top:16px"><h2>Visitas por mês</h2>${barras(ordM.map(k=>[rotMes(k),meses[k]]))}</section>`:""}`;
+    REL.csv=null;
+  }else if(REL.aba==="empresa"){
+    const linhas=[];const nomes=S.reps.map(r=>[r.id,r.nome]);
+    const sem=vis.filter(x=>!(x.representadas||[]).length);
+    nomes.forEach(([id,nome])=>{const l=vis.filter(x=>(x.representadas||[]).includes(id));linhas.push([nome,l]);});
+    if(sem.length)linhas.push(["Sem empresa",sem]);
+    const rows=linhas.map(([n,l])=>{const s=resumoDe(l);return[n,s.real,s.pedidos,s.neg,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real),s.min?fmtDur(s.min):"—"];}).sort((a,b)=>b[1]-a[1]);
+    html=`<section class="card"><h2>Visitas por empresa representada</h2>${barras(rows.map(r=>[r[0],r[1]]))}</section>`+tabelaRel(["Empresa","Realizadas","Pedidos fechados","Em negociação","Agendadas","Canceladas","Clientes visitados","Pedidos por visita","Tempo em visitas"],rows,"visitas-por-empresa")+`<p class="lead" style="margin-top:10px;font-size:12px">Uma visita em nome de duas empresas aparece nas duas linhas; o total geral do Resumo conta uma vez só.</p>`;
+  }else if(REL.aba==="mes"){
+    const g={};vis.forEach(x=>{const k=x.data.slice(0,7);(g[k]=g[k]||[]).push(x);});
+    const ks=Object.keys(g).sort();
+    const rows=ks.map(k=>{const s=resumoDe(g[k]);return[rotMes(k),s.real,s.pedidos,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real)];});
+    html=(ks.length?`<section class="card"><h2>Visitas por mês</h2>${barras(ks.map(k=>[rotMes(k),g[k].length]))}</section>`:"")+tabelaRel(["Mês","Realizadas","Pedidos fechados","Agendadas","Canceladas","Clientes visitados","Pedidos por visita"],rows,"visitas-por-mes");
+  }else if(REL.aba==="semana"){
+    const g={};vis.forEach(x=>{const k=segundaDe(x.data);(g[k]=g[k]||[]).push(x);});
+    const ks=Object.keys(g).sort();
+    const rows=ks.map(k=>{const s=resumoDe(g[k]);return[dataCurta(k)+" a "+dataCurta(somaDias(k,6)),s.real,s.pedidos,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real)];});
+    html=(ks.length?`<section class="card"><h2>Visitas por semana</h2>${barras(ks.map(k=>[dataCurta(k)+" a "+dataCurta(somaDias(k,6)),g[k].length]))}</section>`:"")+tabelaRel(["Semana (segunda a domingo)","Realizadas","Pedidos fechados","Agendadas","Canceladas","Clientes visitados","Pedidos por visita"],rows,"visitas-por-semana");
+  }else if(REL.aba==="cliente"){
+    const g={};vis.forEach(x=>{(g[x.cliente_id]=g[x.cliente_id]||[]).push(x);});
+    const rows=Object.entries(g).map(([id,l])=>{const c=cliPorId(id),s=resumoDe(l);const ult=l.filter(x=>eh(x,"realizada")).sort((a,b)=>b.data.localeCompare(a.data))[0];
+      const reps=[...new Set(l.flatMap(nomeRepVis))].join(", ");
+      return[c?nomeCli(c):"Cliente removido",c?[c.cidade,c.uf].filter(Boolean).join("/"):"",reps,s.real,s.pedidos,ult?dataCurta(ult.data)+"/"+ult.data.slice(0,4):"—"];}).sort((a,b)=>b[3]-a[3]||a[0].localeCompare(b[0],"pt-BR"));
+    const visitados=new Set(Object.keys(g));
+    const sem=S.clientes.filter(c=>c.ativo&&!visitados.has(c.id)).sort((a,b)=>nomeCli(a).localeCompare(nomeCli(b),"pt-BR"));
+    html=tabelaRel(["Cliente","Cidade","Empresas","Realizadas","Pedidos fechados","Última visita"],rows,"visitas-por-cliente")
+      +`<section class="card" style="margin-top:16px"><h2>Clientes sem nenhuma visita neste período (${sem.length})</h2>${sem.length?`<p style="margin:0">${sem.slice(0,60).map(c=>`<a href="#/clientes/${esc(c.id)}">${esc(nomeCli(c))}</a>`).join(" · ")}${sem.length>60?` · e mais ${sem.length-60}…`:""}</p>`:`<p style="margin:0">Todos os clientes tiveram visita no período.</p>`}</section>`;
+  }else{
+    const l=[...vis].sort((a,b)=>chaveVis(b).localeCompare(chaveVis(a)));
+    const rows=l.map(x=>{const c=cliPorId(x.cliente_id);return[dataCurta(x.data)+"/"+x.data.slice(0,4),hhmm(x.hora)||"",c?nomeCli(c):"Cliente removido",nomeRepVis(x).join(", "),STATUS_VIS[x.status]?STATUS_VIS[x.status][1]:x.status,x.resultado||"",x.assunto||"",(x.notas||"").replace(/\s+/g," ")];});
+    html=tabelaRel(["Data","Hora","Cliente","Empresas","Situação","Resultado","Assunto","Anotações"],rows,"visitas-lista");
+  }
+  box.innerHTML=html;
+}
+
+function exportaRel(){
+  if(!REL.csv)return toast("Escolha uma aba com tabela (Por empresa, mês, semana, cliente ou Visitas) para exportar.");
+  const[de,ate]=periodoRel();
+  const cel=c=>{const s=String(c==null?"":c).replace(/"/g,'""');return /[";\n\r]/.test(s)?`"${s}"`:s;};
+  const txt=String.fromCharCode(65279)+[REL.csv.cols,...REL.csv.linhas].map(l=>l.map(cel).join(";")).join("\r\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv;charset=utf-8"}));
+  a.download=`rota-${REL.csv.nome}-${de}-a-${ate}.csv`;document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href);},0);
+  toast("Planilha gerada.");
 }
 
 /* ===================== inicialização ===================== */
