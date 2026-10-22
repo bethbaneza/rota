@@ -78,7 +78,7 @@ button{font-family:inherit}
 
 /* ---------- aplicativo ---------- */
 .top{background:var(--green-900);color:var(--white);padding:max(12px,env(safe-area-inset-top)) 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
-.wrap{max-width:720px;margin:0 auto;padding:24px 20px calc(var(--nav-h) + 40px)}
+.wrap{max-width:none;margin:0;padding:20px 16px calc(var(--nav-h) + 32px)}
 .wrap h1{font-size:26px;margin-bottom:6px}
 .eyebrow{font:600 11px/1 var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--green-500);margin:0 0 10px}
 .lead{margin:0 0 20px;color:var(--n-500)}
@@ -149,7 +149,6 @@ td{padding:10px 12px;border-top:1px solid var(--n-100);vertical-align:top}
 .loading img{width:56px;height:56px;object-fit:contain;animation:fade .6s var(--ease) both}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-@media (min-width:760px){.nav{display:none}.wrap{padding-bottom:48px}.topnav{display:flex!important}.toast{bottom:24px}}
 .mapbox{height:340px;border-radius:16px;overflow:hidden;border:1px solid var(--n-200);margin-bottom:14px;background:var(--n-100)}
 .leaflet-container{font-family:var(--font)}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -167,9 +166,76 @@ td{padding:10px 12px;border-top:1px solid var(--n-100);vertical-align:top}
 .pick:last-child{border-bottom:0}
 .pick input{width:22px;height:22px;accent-color:var(--green-500);flex:none}
 .pick.dis{opacity:.5;cursor:not-allowed}
-.topnav{display:none;gap:4px}
-.topnav a{color:rgba(255,255,255,.8);text-decoration:none;font:500 13.5px var(--font);padding:10px 14px;border-radius:10px}
-.topnav a.on,.topnav a:hover{background:rgba(255,255,255,.12);color:var(--white)}
+/* ===== layout v2: celular + computador em tela cheia ===== */
+.ph{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.ph h1{margin:0}
+.side{display:none}
+.main{min-width:0}
+.sidenav{display:flex;flex-direction:column;gap:4px}
+.sidenav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;color:rgba(255,255,255,.78);text-decoration:none;font:500 14px var(--font)}
+.sidenav a:hover{background:rgba(255,255,255,.08)}
+.sidenav a.on{background:rgba(255,255,255,.14);color:#fff}
+.sidenav .sep{height:1px;background:rgba(255,255,255,.12);margin:8px 6px}
+.who{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;color:rgba(255,255,255,.8);font:500 13px var(--font)}
+.who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (min-width:900px){
+  .side{display:flex;flex-direction:column;gap:26px;position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--grad-assist);padding:24px 16px;z-index:6;overflow-y:auto;color:#fff}
+  .main{margin-left:240px}
+  .top{display:none}.nav{display:none}
+  .wrap{padding:28px 36px 56px}
+  .toast{bottom:24px}
+  .scrim{place-items:center}
+  .sheet{border-radius:24px;max-width:640px;padding-bottom:22px}
+}
+.kpis4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+@media (min-width:900px){.kpis4{grid-template-columns:repeat(4,1fr)}}
+.kpi b{font-size:24px}
+.dash{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:900px){.dash{grid-template-columns:repeat(2,1fr)}}
+.dash .card{margin:0}
+.formgrid{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+@media (min-width:900px){.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1500px){.formgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.formgrid .card{margin-bottom:0}
+.only-desk{display:none}
+@media (min-width:900px){.only-desk{display:block}.only-mob{display:none}}
+.agenda{display:grid;gap:18px;grid-template-columns:1fr;align-items:start}
+@media (min-width:900px){.agenda{grid-template-columns:minmax(330px,400px) minmax(0,1fr)}}
+.calh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.calh b{font:600 17px var(--display);color:var(--navy-900);text-align:center}
+.calh b::first-letter,.cap1::first-letter{text-transform:uppercase}
+.calg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.calw{font:600 11px var(--font);color:var(--n-500);text-align:center;padding:4px 0;text-transform:uppercase}
+.cald{aspect-ratio:1/1;min-height:42px;border:1px solid var(--n-100);border-radius:12px;background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;font:500 14px var(--font);color:var(--n-700);padding:0}
+.cald:hover{background:var(--n-50)}
+.cald.fora{opacity:.4}
+.cald.hoje{border-color:var(--green-400);font-weight:700}
+.cald.sel{background:var(--green-500);color:#fff;border-color:var(--green-500)}
+.cald i{font:700 10px var(--font);font-style:normal;color:var(--green-500)}
+.cald.sel i{color:#fff}
+.vis{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--n-100);cursor:pointer;align-items:flex-start}
+.vis:last-child{border-bottom:0}
+.vis:hover{background:var(--n-50)}
+.vis .hr{width:64px;flex:none;font:700 15px var(--display);color:var(--navy-900)}
+.vis .hr small{display:block;font:500 11px var(--font);color:var(--n-500)}
+.vis .t{font-weight:600;color:var(--navy-900);line-height:1.3}
+.vis .d{font-size:13px;color:var(--n-500);line-height:1.4}
+.vis.cancel .t{text-decoration:line-through;color:var(--n-500)}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.pickbox{border:1px solid var(--n-200);border-radius:14px;max-height:220px;overflow:auto;margin-top:6px;background:var(--white)}
+.pickbox button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--n-100);padding:10px 14px;cursor:pointer;font:500 14px var(--font);color:var(--n-700)}
+.pickbox button:hover:not([disabled]){background:var(--n-50)}
+.pickbox button[disabled]{opacity:.55;cursor:not-allowed}
+.pickbox small{display:block;color:var(--n-500);font-weight:400}
+.rotagrid{display:grid;gap:18px;grid-template-columns:1fr;align-items:start}
+@media (min-width:1100px){.rotagrid{grid-template-columns:minmax(360px,440px) minmax(0,1fr)}}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tbl-click tbody tr{cursor:pointer}
+.tbl-click tbody tr:hover{background:var(--n-50)}
+.tbl-click td,.tbl-click th{padding:12px 14px}
+.search{max-width:560px}
+.mapbox{height:340px}
+@media (min-width:900px){.mapbox{height:420px}}
 </style>
 </head>
 <body>
@@ -196,11 +262,15 @@ td{padding:10px 12px;border-top:1px solid var(--n-100);vertical-align:top}
 
 <!-- APLICATIVO -->
 <div id="v-app" hidden>
-  <header class="top">
-    <div class="lockup sm"><img class="mk" src="assets/mark-green.png" alt=""><div class="wm"><img src="assets/wordmark-white.png" alt="Banheza"><span>ROTA</span></div></div>
-    <nav class="topnav" id="topnav"></nav>
-  </header>
-  <div class="wrap" id="view"></div>
+  <aside class="side" id="side">
+    <div class="lockup"><img class="mk" src="assets/mark-green.png" alt=""><div class="wm"><img src="assets/wordmark-white.png" alt="Banheza"><span>ROTA</span></div></div>
+    <nav class="sidenav" id="sidenav"></nav>
+    <div class="who"><span id="who-nome"></span><button class="btn ghostw sm" id="b-sair" type="button">Sair</button></div>
+  </aside>
+  <div class="main">
+    <header class="top"><div class="lockup sm"><img class="mk" src="assets/mark-green.png" alt=""><div class="wm"><img src="assets/wordmark-white.png" alt="Banheza"><span>ROTA</span></div></div></header>
+    <div class="wrap" id="view"></div>
+  </div>
   <nav class="nav" id="nav"></nav>
 </div>
 
@@ -286,7 +356,7 @@ async function lerArquivo(file){
 
 /* ===================== estado e dados ===================== */
 let supa=null;
-const S={perfil:null,uid:null,reps:[],clientes:[],contatos:[],rotas:[]};
+const S={perfil:null,uid:null,reps:[],clientes:[],contatos:[],visitas:[],semVisitas:false};
 async function pagina(tabela){
   const out=[];
   for(let de=0;;de+=1000){
@@ -298,8 +368,8 @@ async function pagina(tabela){
 async function carregar(){
   const[r,c,t]=await Promise.all([pagina("rota_representadas"),pagina("rota_clientes"),pagina("rota_contatos")]);
   S.reps=r;S.clientes=c;S.contatos=t;
-  try{S.rotas=(await pagina("rota_rotas")).sort((a,b)=>String(b.data).localeCompare(String(a.data))||String(b.criado_em).localeCompare(String(a.criado_em)));}
-  catch(e){S.rotas=[];}   // a tabela da Etapa 2 pode ainda não existir: o resto do app segue funcionando
+  try{S.visitas=await pagina("rota_visitas");S.semVisitas=false;}
+  catch(e){S.visitas=[];S.semVisitas=true;}   // a agenda (Etapa 3) pode ainda não existir: o resto do app segue funcionando
 }
 const cliPorId=id=>S.clientes.find(c=>c.id===id);
 const contatosDe=id=>S.contatos.filter(t=>t.cliente_id===id);
@@ -307,6 +377,7 @@ const repNome=id=>(S.reps.find(r=>r.id===id)||{}).nome||"";
 function erroBanco(e){
   const m=String((e&&e.message)||e||"");
   if(/rota_clientes_doc_uk|duplicate key/i.test(m))return "Já existe um cliente com este CNPJ/CPF.";
+  if(/rota_visitas|checkin_(lat|lng)/i.test(m))return "A agenda ainda não foi ativada no banco. Rode o arquivo supabase-rota-etapa3.sql no SQL Editor do Supabase.";
   // campos e tabela da Etapa 2 (mapa e rota) ainda não criados
   if(/geo_status|casa_(lat|lng|cep|endereco|numero|bairro|cidade|uf)|visita_padrao_min|rota_rotas/i.test(m))return "O banco ainda não tem os campos do mapa e da rota. Rode o arquivo supabase-rota-etapa2.sql no SQL Editor do Supabase.";
   if(/relation .* does not exist|could not find the table|schema cache/i.test(m))return "As tabelas do Rota ainda não foram criadas no banco. Rode o arquivo supabase-rota-clientes.sql.";
@@ -399,47 +470,82 @@ async function esqueci(){
 }
 
 /* ===================== roteador ===================== */
-const NAV=[["inicio","house","Início"],["clientes","users","Clientes"],["rota","route","Rota"],["mais","ellipsis","Mais"]];
+// menu principal (celular: barra de baixo; computador: menu lateral)
+const NAV_MOB=[["inicio","house","Início"],["agenda","calendar-days","Agenda"],["clientes","users","Clientes"],["rota","route","Rota"],["mais","ellipsis","Mais"]];
+const NAV_SIDE=[["inicio","house","Início"],["agenda","calendar-days","Agenda"],["clientes","users","Clientes"],["rota","route","Rota do dia"],["mapa","map-pin","Mapa"],["-"],["representadas","building-2","Representadas"],["importar","file-spreadsheet","Importar planilha"],["casa","settings","Minha casa"]];
 function desenhaNav(atual){
-  const grupo={inicio:"inicio",clientes:"clientes",mapa:"clientes",rota:"rota",mais:"mais",representadas:"mais",importar:"mais",casa:"mais"}[atual]||"inicio";
-  $("#nav").innerHTML=NAV.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""}">${IC(i)}<span>${t}</span></a>`).join("");
-  $("#topnav").innerHTML=NAV.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupo?"on":""}">${t}</a>`).join("")+`<a href="#/importar" class="${atual==="importar"?"on":""}">Importar</a>`;
+  const grupoMob={inicio:"inicio",agenda:"agenda",clientes:"clientes",mapa:"clientes",rota:"rota",mais:"mais",representadas:"mais",importar:"mais",casa:"mais"}[atual]||"inicio";
+  $("#nav").innerHTML=NAV_MOB.map(([k,i,t])=>`<a href="#/${k}" class="${k===grupoMob?"on":""}">${IC(i)}<span>${t}</span></a>`).join("");
+  $("#sidenav").innerHTML=NAV_SIDE.map(([k,i,t])=>k==="-"?'<div class="sep"></div>':`<a href="#/${k}" class="${k===atual?"on":""}">${IC(i)}<span>${t}</span></a>`).join("");
+  $("#who-nome").textContent=S.perfil?(S.perfil.nome||""):"";
 }
 function rota(){
   if(!S.perfil)return;
   const [r,a]=(location.hash.replace(/^#\/?/,"")||"inicio").split("/");
   const v=$("#view");window.scrollTo(0,0);
   desenhaNav(r);
-  const mapa={inicio:telaInicio,clientes:()=>a?telaCliente(v,a):telaClientes(v),mapa:telaMapa,rota:telaRota,casa:telaCasa,representadas:telaReps,importar:telaImportar,mais:telaMais};
+  const mapa={inicio:telaInicio,agenda:telaAgenda,clientes:()=>a?telaCliente(v,a):telaClientes(v),mapa:telaMapa,rota:telaRota,casa:telaCasa,representadas:telaReps,importar:telaImportar,mais:telaMais};
   (mapa[r]||telaInicio)(v);
 }
 window.addEventListener("hashchange",rota);
+async function sair(){await supa.auth.signOut();S.perfil=null;S.clientes=[];S.reps=[];S.contatos=[];S.visitas=[];R.res=null;telaAuth("entrar");}
 
-/* ===================== telas ===================== */
+/* ===================== painel inicial ===================== */
 function telaInicio(v){
   const nome=(S.perfil.nome||"").split(" ")[0];
   const trial=S.perfil.plano==="trial"&&S.perfil.trial_ate?"Seu teste grátis vai até "+fmtData(S.perfil.trial_ate)+".":"";
-  const semEnd=S.clientes.filter(c=>c.ativo&&!c.cep&&!c.endereco).length;
-  v.innerHTML=`<p class="eyebrow">Início</p><h1>Olá${nome?", "+esc(nome):""}.</h1><p class="lead">${esc(trial)}</p>
+  const hoje=hojeISO(),fimSem=somaDias(hoje,6);
+  const ativas=S.visitas.filter(x=>x.status==="agendada");
+  const proximas=ativas.filter(x=>x.data>=hoje).sort((a,b)=>chaveVis(a).localeCompare(chaveVis(b)));
+  const atrasadas=ativas.filter(x=>x.data<hoje);
+  const ultimas=S.visitas.filter(x=>x.status==="realizada").sort((a,b)=>String(b.realizada_em||b.data).localeCompare(String(a.realizada_em||a.data))).slice(0,5);
+  const nHoje=proximas.filter(x=>x.data===hoje).length,nSem=proximas.filter(x=>x.data<=fimSem).length;
+  const semLoc=S.clientes.filter(c=>c.ativo&&c.lat==null&&(c.endereco||c.cep||c.cidade)&&c.geo_status!=="falhou").length;
+  // clientes que passaram da frequência de visita combinada
+  const venc=S.clientes.filter(c=>c.ativo&&c.freq_dias>0&&!proximaVisita(c.id)).map(c=>{
+    const u=ultimaVisita(c.id);const dias=u?Math.floor((new Date(hoje+"T12:00:00")-new Date(u.data+"T12:00:00"))/86400000):null;
+    return{c,dias,atraso:dias==null?9999:dias-c.freq_dias};
+  }).filter(x=>x.atraso>0).sort((a,b)=>b.atraso-a.atraso).slice(0,6);
+  v.innerHTML=`<div class="ph"><div><p class="eyebrow">Início</p><h1>Olá${nome?", "+esc(nome):""}.</h1><p class="lead" style="margin:4px 0 0">${esc(trial)}</p></div>
+      <div class="actbar"><button class="btn primary" id="nv">${IC("plus","sm")} Nova visita</button><a class="btn sec" href="#/rota">${IC("route","sm")} Montar a rota de hoje</a></div></div>
     ${S.carregouErro?`<div class="msg err">${esc(S.carregouErro)}</div>`:""}
-    <div class="grid2 keep" style="margin-bottom:16px">
-      <div class="card" style="margin:0"><p style="margin:0">Clientes</p><h1 style="margin:4px 0 0">${S.clientes.filter(c=>c.ativo).length}</h1></div>
-      <div class="card" style="margin:0"><p style="margin:0">Representadas</p><h1 style="margin:4px 0 0">${S.reps.length}</h1></div>
+    ${S.semVisitas?`<div class="msg warn">A agenda ainda não foi ativada no banco. Rode o arquivo <b>supabase-rota-etapa3.sql</b> no SQL Editor do Supabase.</div>`:""}
+    ${atrasadas.length?`<div class="msg warn row between"><span>${atrasadas.length} visita${atrasadas.length>1?"s":""} agendada${atrasadas.length>1?"s":""} com data passada. Conclua, reagende ou cancele.</span><a class="btn sec sm" href="#/agenda">Ver agenda</a></div>`:""}
+    ${semLoc?`<div class="msg warn row between"><span>${semLoc} cliente${semLoc>1?"s":""} sem localização no mapa. Eles não entram na rota do dia.</span><a class="btn sec sm" href="#/clientes">Localizar</a></div>`:""}
+    <div class="kpis4">
+      <div class="kpi"><b>${nHoje}</b><span>Visitas hoje</span></div>
+      <div class="kpi"><b>${nSem}</b><span>Próximos 7 dias</span></div>
+      <div class="kpi"><b>${atrasadas.length}</b><span>Atrasadas</span></div>
+      <div class="kpi"><b>${S.clientes.filter(c=>c.ativo).length}</b><span>Clientes · ${S.reps.length} representada${S.reps.length===1?"":"s"}</span></div>
     </div>
-    ${S.clientes.length?"":`<div class="empty"><p>Você ainda não tem clientes. Cadastre o primeiro ou importe a sua carteira por planilha.</p><div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div></div>`}
-    ${semEnd?`<div class="msg warn">${semEnd} cliente${semEnd>1?"s":""} sem endereço. Sem endereço, o cliente não entra na rota do dia.</div>`:""}
-    <div class="card"><h2>Rota do dia</h2><p>Escolha as visitas do dia e receba a melhor ordem pelas ruas, com a distância e o tempo.</p><a class="btn primary" href="#/rota">Montar a rota de hoje</a></div>`;
+    <div class="dash">
+      <section class="card"><div class="sec-h" style="margin-top:0"><h2 style="margin:0">Próximas visitas</h2><a href="#/agenda" class="btn sec sm">Ver agenda</a></div>
+        ${proximas.length?`<div class="list" style="border:0;border-radius:0">${proximas.slice(0,5).map(x=>linhaVisita(x,{data:1})).join("")}</div>`:`<div class="empty" style="border:0"><p>Nenhuma visita agendada. Agende a primeira para ela aparecer aqui.</p><button class="btn primary" id="nv2">Agendar visita</button></div>`}
+      </section>
+      <section class="card"><div class="sec-h" style="margin-top:0"><h2 style="margin:0">Últimas 5 visitas</h2></div>
+        ${ultimas.length?`<div class="list" style="border:0;border-radius:0">${ultimas.map(x=>linhaVisita(x,{data:1,resultado:1})).join("")}</div>`:`<div class="empty" style="border:0"><p>Ainda não há visitas concluídas. Quando você concluir uma visita na agenda, ela aparece aqui.</p></div>`}
+      </section>
+    </div>
+    ${venc.length?`<section class="card" style="margin-top:16px"><h2>Clientes para visitar</h2><p>Passaram do intervalo de visita combinado e não têm nada agendado.</p>
+      <div class="list" style="border:0;border-radius:0">${venc.map(x=>`<div class="item"><span class="avatar">${esc(iniciais(x.c))}</span><div class="grow"><div class="t"><a href="#/clientes/${esc(x.c.id)}" style="color:inherit;text-decoration:none">${esc(nomeCli(x.c))}</a></div><div class="d">${x.dias==null?"Nunca visitado":"Última visita há "+x.dias+" dias"} · combinado a cada ${x.c.freq_dias} dias</div></div><button class="btn sec sm" data-ag="${esc(x.c.id)}">Agendar</button></div>`).join("")}</div></section>`:""}
+    ${S.clientes.length?"":`<div class="empty" style="margin-top:16px"><p>Você ainda não tem clientes. Cadastre o primeiro ou importe a sua carteira por planilha.</p><div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div></div>`}`;
+  const novo=()=>formVisita(null,null);
+  v.querySelector("#nv").onclick=novo;v.querySelector("#nv2")&&(v.querySelector("#nv2").onclick=novo);
+  v.querySelectorAll("[data-ag]").forEach(b=>b.onclick=()=>formVisita(null,b.dataset.ag));
+  ligaVisitas(v);
 }
 
+/* ===================== mais (celular) ===================== */
 function telaMais(v){
   v.innerHTML=`<p class="eyebrow">Mais</p><h1>Mais opções</h1><p class="lead">${esc(S.perfil.nome||"")}</p>
     <div class="list">
+      <a class="item" href="#/mapa"><span class="avatar">${IC("map-pin")}</span><div class="grow"><div class="t">Mapa dos clientes</div><div class="d">Veja a carteira no mapa</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/casa"><span class="avatar">${IC("house")}</span><div class="grow"><div class="t">Minha casa e visitas</div><div class="d">${S.perfil.casa_lat!=null?"Ponto de saída definido":"Defina o seu ponto de saída"} · visita padrão de ${S.perfil.visita_padrao_min||45} min</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/representadas"><span class="avatar">${IC("building-2")}</span><div class="grow"><div class="t">Representadas</div><div class="d">As empresas que você atende</div></div>${IC("chevron-right","sm")}</a>
       <a class="item" href="#/importar"><span class="avatar">${IC("file-spreadsheet")}</span><div class="grow"><div class="t">Importar planilha</div><div class="d">Traga clientes do Bling ou de qualquer sistema</div></div>${IC("chevron-right","sm")}</a>
     </div>
     <div style="margin-top:20px"><button class="btn sec block" id="sair">Sair</button></div>`;
-  v.querySelector("#sair").onclick=async()=>{await supa.auth.signOut();S.perfil=null;S.clientes=[];S.reps=[];S.contatos=[];telaAuth("entrar");};
+  v.querySelector("#sair").onclick=sair;
 }
 
 /* ---------- representadas ---------- */
@@ -482,10 +588,10 @@ function formRep(r){
 let FILTRO={q:"",rep:""};
 function telaClientes(v){
   const semLoc=S.clientes.filter(c=>c.ativo&&c.lat==null&&(c.endereco||c.cep||c.cidade)&&c.geo_status!=="falhou").length;
-  v.innerHTML=`<div class="row between"><div><p class="eyebrow">Carteira</p><h1>Clientes</h1></div><div class="actbar"><a class="btn sec sm" href="#/mapa">${IC("map-pin","sm")} Mapa</a><a class="btn primary sm" href="#/clientes/novo">${IC("plus","sm")} Novo</a></div></div>
+  v.innerHTML=`<div class="ph"><div><p class="eyebrow">Cadastro</p><h1>Clientes</h1></div><div class="actbar"><a class="btn sec" href="#/mapa">${IC("map-pin","sm")} Mapa</a><a class="btn sec" href="#/importar">${IC("file-spreadsheet","sm")} Importar</a><a class="btn primary" href="#/clientes/novo">${IC("plus","sm")} Novo cliente</a></div></div>
     ${semLoc?`<div class="msg warn row between" style="margin-bottom:14px"><span>${semLoc} cliente${semLoc>1?"s":""} sem localização no mapa.</span><button class="btn sec sm" id="loc">Localizar agora</button></div>`:""}
-    <div class="search">${IC("search")}<input id="q" type="search" placeholder="Buscar nome, CNPJ ou cidade" value="${esc(FILTRO.q)}" aria-label="Buscar clientes"></div>
-    ${S.reps.length?`<div class="chips" id="chips"><button class="chip ${FILTRO.rep===""?"on":""}" data-r="">Todas</button>${S.reps.map(r=>`<button class="chip ${FILTRO.rep===r.id?"on":""}" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
+    <div class="row" style="margin-bottom:6px;align-items:flex-start"><div class="search grow" style="min-width:240px">${IC("search")}<input id="q" type="search" placeholder="Buscar nome, CNPJ, cidade ou comprador" value="${esc(FILTRO.q)}" aria-label="Buscar clientes"></div></div>
+    ${S.reps.length?`<div class="chips" id="chips"><button class="chip ${FILTRO.rep===""?"on":""}" data-r="">Todas as empresas</button>${S.reps.map(r=>`<button class="chip ${FILTRO.rep===r.id?"on":""}" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
     <p class="lead" id="cont" style="margin-bottom:10px"></p><div id="lista"></div>`;
   const desenha=()=>{
     const q=semAcento(FILTRO.q).trim();
@@ -496,12 +602,31 @@ function telaClientes(v){
       return q.split(/\s+/).every(w=>t.includes(w)||(dig(w).length>=3&&td.includes(dig(w))));
     }).sort((a,b)=>nomeCli(a).localeCompare(nomeCli(b),"pt-BR"));
     v.querySelector("#cont").textContent=lista.length+(lista.length===1?" cliente":" clientes");
-    v.querySelector("#lista").innerHTML=lista.length?`<div class="list">${lista.slice(0,300).map(c=>{
+    const mostra=lista.slice(0,300),hoje=hojeISO();
+    if(!lista.length){
+      v.querySelector("#lista").innerHTML=`<div class="empty"><p>${S.clientes.length?"Nenhum cliente encontrado. Tente outra busca.":"Você ainda não tem clientes. Cadastre o primeiro ou importe uma planilha."}</p>${S.clientes.length?"":`<div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div>`}</div>`;
+      return;
+    }
+    // celular: lista; computador: tabela larga
+    const mob=`<div class="list only-mob">${mostra.map(c=>{
       const comp=contatosDe(c.id).find(t=>t.principal)||contatosDe(c.id)[0];
       const loc=[c.cidade&&(c.cidade+(c.uf?"/"+c.uf:"")),comp&&comp.nome].filter(Boolean).join(" · ");
       return `<a class="item" href="#/clientes/${esc(c.id)}"><span class="avatar">${esc(iniciais(c))}</span><div class="grow"><div class="t">${esc(nomeCli(c))}</div><div class="d">${esc(loc||"Sem endereço")}</div></div>${!c.cep&&!c.endereco?'<span class="badge warn">sem endereço</span>':""}${IC("chevron-right","sm")}</a>`;
-    }).join("")}</div>${lista.length>300?`<p class="lead" style="margin-top:10px">Mostrando 300 de ${lista.length}. Use a busca para achar os demais.</p>`:""}`
-      :`<div class="empty"><p>${S.clientes.length?"Nenhum cliente encontrado. Tente outra busca.":"Você ainda não tem clientes. Cadastre o primeiro ou importe uma planilha."}</p>${S.clientes.length?"":`<div class="actbar" style="justify-content:center"><a class="btn primary" href="#/clientes/novo">Novo cliente</a><a class="btn sec" href="#/importar">Importar planilha</a></div>`}</div>`;
+    }).join("")}</div>`;
+    const desk=`<div class="tblwrap only-desk"><table class="tbl-click"><thead><tr><th>Cliente</th><th>Comprador</th><th>Telefone</th><th>Cidade</th><th>Representadas</th><th>Última visita</th><th>Próxima visita</th><th></th></tr></thead><tbody>${mostra.map(c=>{
+      const comp=contatosDe(c.id).find(t=>t.principal)||contatosDe(c.id)[0];
+      const fone=(comp&&comp.tel)||c.celular||c.tel||"";
+      const u=ultimaVisita(c.id),p=proximaVisita(c.id);
+      return `<tr data-cli="${esc(c.id)}"><td><b>${esc(nomeCli(c))}</b>${c.fantasia&&c.razao&&c.fantasia!==c.razao?`<div style="color:var(--n-500);font-size:12px">${esc(c.razao)}</div>`:""}</td>
+        <td>${esc(comp?comp.nome:"")}</td><td style="white-space:nowrap">${esc(fmtTel(fone))}</td>
+        <td>${esc([c.cidade,c.uf].filter(Boolean).join("/"))||'<span class="badge warn">sem endereço</span>'}</td>
+        <td><div class="badges" style="margin:0">${(c.representadas||[]).map(id=>`<span class="badge">${esc(repNome(id))}</span>`).join("")}</div></td>
+        <td style="white-space:nowrap">${u?esc(dataCurta(u.data)):"—"}</td><td style="white-space:nowrap">${p?esc(dataCurta(p.data)):"—"}</td>
+        <td style="text-align:right"><button class="btn sec sm" data-ag="${esc(c.id)}">Agendar</button></td></tr>`;
+    }).join("")}</tbody></table></div>`;
+    v.querySelector("#lista").innerHTML=mob+desk+(lista.length>300?`<p class="lead" style="margin-top:10px">Mostrando 300 de ${lista.length}. Use a busca para achar os demais.</p>`:"");
+    v.querySelectorAll("#lista tr[data-cli]").forEach(tr=>tr.onclick=e=>{if(e.target.closest("[data-ag]"))return;location.hash="#/clientes/"+tr.dataset.cli;});
+    v.querySelectorAll("#lista [data-ag]").forEach(b=>b.onclick=e=>{e.stopPropagation();formVisita(null,b.dataset.ag);});
   };
   v.querySelector("#loc")&&(v.querySelector("#loc").onclick=()=>abreLocalizacao(()=>rota()));
   v.querySelector("#q").oninput=e=>{FILTRO.q=e.target.value;desenha();};
@@ -526,8 +651,10 @@ function telaCliente(v,id){
     v.querySelectorAll("#ctts [data-rm]").forEach(b=>b.onclick=()=>{lerCtts();ctts.splice(+b.dataset.rm,1);desenhaCtts();});
   };
   const lerCtts=()=>v.querySelectorAll("#ctts .ctt").forEach(el=>{const t=ctts[+el.dataset.i];el.querySelectorAll("[data-f]").forEach(i=>{t[i.dataset.f]=i.value.trim();});});
-  v.innerHTML=`<div class="row between" style="margin-bottom:8px"><a class="iconbtn" href="#/clientes" aria-label="Voltar">${IC("arrow-left")}</a><h1 style="font-size:20px;flex:1;margin:0 12px">${novo?"Novo cliente":esc(nomeCli(c))}</h1></div>
+  v.innerHTML=`<div class="ph"><div class="row"><a class="iconbtn" href="#/clientes" aria-label="Voltar">${IC("arrow-left")}</a><div><p class="eyebrow" style="margin:0 0 4px">Cliente</p><h1>${novo?"Novo cliente":esc(nomeCli(c))}</h1></div></div>
+      <div class="actbar">${novo?"":`<button class="btn sec" id="agv" type="button">${IC("calendar-plus","sm")} Agendar visita</button>`}<button class="btn primary" id="salvar2" type="button">Salvar cliente</button></div></div>
     <div id="msg"></div>
+    <div class="formgrid">
     <div class="card"><h2>Empresa</h2>
       <div class="f"><label for="c_razao">Razão social ou nome</label><input id="c_razao" value="${esc(c.razao)}" autocomplete="off"></div>
       ${campo("fantasia","Nome fantasia")}
@@ -546,7 +673,7 @@ function telaCliente(v,id){
       <div class="actbar">${hrefTel(c.tel||c.celular)?`<a class="btn sec sm" href="${hrefTel(c.celular||c.tel)}">${IC("phone","sm")} Ligar</a>`:""}${hrefWpp(c.celular||c.tel)?`<a class="btn sec sm" target="_blank" rel="noopener" href="${hrefWpp(c.celular||c.tel)}">${IC("message-circle","sm")} WhatsApp</a>`:""}</div>
     </div>
     <div class="card"><div class="sec-h" style="margin-top:0"><h2 style="margin:0">Contatos (comprador e outros)</h2><button class="btn sec sm" id="addc" type="button">${IC("plus","sm")} Adicionar</button></div><div id="ctts"></div></div>
-    <div class="card"><h2>Visitas</h2>
+    <div class="card"><h2>Preferências de visita</h2>
       <div class="f"><label for="c_horario">Dias e horários em que atende</label><input id="c_horario" value="${esc(c.horario)}" placeholder="Ex.: seg a sex, 8h às 17h"></div>
       <div class="grid2"><div class="f"><label for="c_tempo">Tempo médio de visita (min)</label><input id="c_tempo" inputmode="numeric" value="${c.tempo_visita_min==null?"":esc(c.tempo_visita_min)}"></div><div class="f"><label for="c_freq">Visitar a cada (dias)</label><input id="c_freq" inputmode="numeric" value="${c.freq_dias==null?"":esc(c.freq_dias)}"></div></div>
     </div>
@@ -554,8 +681,13 @@ function telaCliente(v,id){
       ${S.reps.length?S.reps.map(r=>`<label class="chk"><input type="checkbox" data-rep="${esc(r.id)}" ${(c.representadas||[]).includes(r.id)?"checked":""}> ${esc(r.nome)}</label>`).join(""):`<p>Você ainda não cadastrou representadas. <a href="#/representadas">Cadastrar agora</a>.</p>`}
     </div>
     <div class="card"><h2>Observações</h2><div class="f" style="margin:0"><textarea id="c_obs">${esc(c.obs)}</textarea></div></div>
-    <div class="actbar"><button class="btn primary" id="salvar">Salvar cliente</button>${novo?"":'<button class="btn danger" id="excluir">Excluir</button>'}<a class="btn sec" href="#/clientes">Cancelar</a></div>`;
+    ${novo?"":`<div class="card"><div class="sec-h" style="margin-top:0"><h2 style="margin:0">Histórico de visitas</h2></div>${visDoCliente(c.id).length?`<div class="list" style="border:0;border-radius:0">${visDoCliente(c.id).sort((a,b)=>chaveVis(b).localeCompare(chaveVis(a))).slice(0,8).map(x=>linhaVisita(x,{data:1,status:1,resultado:1})).join("")}</div>`:`<p style="margin:0">Nenhuma visita registrada para este cliente.</p>`}</div>`}
+    </div>
+    <div class="actbar" style="margin-top:16px"><button class="btn primary" id="salvar">Salvar cliente</button>${novo?"":'<button class="btn danger" id="excluir">Excluir</button>'}<a class="btn sec" href="#/clientes">Cancelar</a></div>`;
   desenhaCtts();
+  v.querySelector("#salvar2").onclick=()=>v.querySelector("#salvar").click();
+  v.querySelector("#agv")&&(v.querySelector("#agv").onclick=()=>formVisita(null,c.id));
+  ligaVisitas(v);
   v.querySelector("#addc").onclick=()=>{lerCtts();ctts.push({_id:"n"+(seq++),nome:"",cargo:"",tel:"",email:"",principal:!ctts.length});desenhaCtts();};
   // busca do endereço pelo CEP (ViaCEP)
   const cep=v.querySelector("#c_cep"),cm=v.querySelector("#cepmsg");
@@ -1117,131 +1249,338 @@ async function telaMapa(v){
   desenha();setTimeout(()=>m.invalidateSize(),200);
 }
 
-/* ---- rota do dia ---- */
-let R={sel:new Set(),q:"",rep:"",data:null,inicio:"08:00",voltar:true,res:null,calculando:false};
+/* ===================== agenda de visitas ===================== */
+const STATUS_VIS={agendada:["","Agendada"],realizada:["good","Realizada"],cancelada:["crit","Cancelada"]};
+const RESULTADOS=["Visita realizada","Pedido fechado","Pedido em negociação","Sem interesse","Cliente ausente — voltar depois"];
+const hhmm=h=>String(h||"").slice(0,5);
+const isoLocal=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const somaDias=(iso,n)=>{const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return isoLocal(d);};
+const dataCurta=iso=>{const p=String(iso||"").split("-");return p.length===3?p[2]+"/"+p[1]:"";};
+function rotuloData(iso){
+  const h=hojeISO();
+  if(iso===h)return"Hoje";if(iso===somaDias(h,1))return"Amanhã";if(iso===somaDias(h,-1))return"Ontem";
+  return new Date(iso+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"2-digit"});
+}
+const chaveVis=x=>(x.data||"")+" "+(hhmm(x.hora)||"99:99")+" "+String(x.ordem==null?99:x.ordem).padStart(3,"0");
+const visDoCliente=id=>S.visitas.filter(x=>x.cliente_id===id);
+const ultimaVisita=id=>visDoCliente(id).filter(x=>x.status==="realizada").sort((a,b)=>String(b.data).localeCompare(String(a.data)))[0]||null;
+const proximaVisita=id=>visDoCliente(id).filter(x=>x.status==="agendada"&&x.data>=hojeISO()).sort((a,b)=>chaveVis(a).localeCompare(chaveVis(b)))[0]||null;
+const pegaGPS=()=>new Promise(res=>{if(!navigator.geolocation)return res(null);navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),()=>res(null),{enableHighAccuracy:true,timeout:9000,maximumAge:60000});});
+
+function linhaVisita(x,o){
+  o=o||{};const c=cliPorId(x.cliente_id);
+  const reps=(x.representadas||[]).map(repNome).filter(Boolean);
+  const loc=c?[c.cidade&&(c.cidade+(c.uf?"/"+c.uf:"")),x.assunto].filter(Boolean).join(" · "):"";
+  const st=STATUS_VIS[x.status]||["",x.status];
+  return `<div class="vis ${x.status==="cancelada"?"cancel":""}" data-vis="${esc(x.id)}"><div class="hr">${o.data?esc(rotuloData(x.data)):(esc(hhmm(x.hora))||"—")}<small>${o.data?(esc(hhmm(x.hora))||"sem hora"):(x.duracao_min?x.duracao_min+" min":"")}</small></div>
+    <div class="grow"><div class="t">${esc(c?nomeCli(c):"Cliente removido")}</div><div class="d">${esc(loc)}${o.resultado&&x.resultado?` · ${esc(x.resultado)}`:""}</div>
+    <div class="badges">${x.status!=="agendada"||o.status?`<span class="badge ${st[0]}">${st[1]}</span>`:""}${reps.map(n=>`<span class="badge">${esc(n)}</span>`).join("")}</div></div>${IC("chevron-right","sm")}</div>`;
+}
+const ligaVisitas=root=>root.querySelectorAll("[data-vis]").forEach(e=>e.onclick=()=>abreVisita(e.dataset.vis));
+
+async function gravaVisita(id,campos){
+  const q=id?supa.from("rota_visitas").update({...campos,atualizado_em:new Date().toISOString()}).eq("id",id).select().single():supa.from("rota_visitas").insert(campos).select().single();
+  const{data,error}=await q;if(error)throw error;
+  const i=S.visitas.findIndex(v=>v.id===data.id);if(i>=0)S.visitas[i]=data;else S.visitas.push(data);
+  return data;
+}
+
+/* ---- detalhes da visita ---- */
+function abreVisita(id){
+  const x=S.visitas.find(v=>v.id===id);if(!x)return;
+  const c=cliPorId(x.cliente_id);
+  const reps=(x.representadas||[]).map(repNome).filter(Boolean);
+  const st=STATUS_VIS[x.status]||["",x.status];
+  const botoes=x.status==="agendada"
+    ?`<button class="btn primary" id="vo">${IC("check","sm")} Concluir</button><button class="btn sec" id="ve">Editar</button><button class="btn danger" id="vk">Cancelar visita</button>`
+    :x.status==="realizada"
+      ?`<button class="btn sec" id="vo">Editar anotações</button><button class="btn sec" id="vr">Voltar para agendada</button>`
+      :`<button class="btn primary" id="ve">Reagendar</button>`;
+  sheet(`<h2>${esc(c?nomeCli(c):"Cliente removido")}</h2>
+    <p>${esc(rotuloData(x.data))}${hhmm(x.hora)?" às "+esc(hhmm(x.hora)):""}${x.duracao_min?" · "+x.duracao_min+" min":""}</p>
+    <div class="badges" style="margin:0 0 12px"><span class="badge ${st[0]}">${st[1]}</span>${reps.map(n=>`<span class="badge">${esc(n)}</span>`).join("")}</div>
+    ${c?`<p style="margin-bottom:8px">${esc(enderecoLinha(c))||"Sem endereço cadastrado"}</p>`:""}
+    ${x.assunto?`<p><b>Assunto:</b> ${esc(x.assunto)}</p>`:""}
+    ${x.resultado?`<p><b>Resultado:</b> ${esc(x.resultado)}</p>`:""}
+    ${x.notas?`<p style="white-space:pre-wrap">${esc(x.notas)}</p>`:""}
+    <div class="actbar" style="margin-bottom:10px">${botoes}</div>
+    <div class="actbar">${c?`<a class="btn sec sm" href="#/clientes/${esc(c.id)}">Abrir cliente</a>`:""}${c&&c.lat!=null?`<a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkWaze(c))}">Waze</a><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkMaps(c))}">Google Maps</a>`:""}${hrefWpp(c&&(c.celular||c.tel))?`<a class="btn sec sm" target="_blank" rel="noopener" href="${esc(hrefWpp(c.celular||c.tel))}">WhatsApp</a>`:""}<button class="btn danger sm" id="vd">Excluir</button><button class="btn sec sm" id="vf">Fechar</button></div>`,d=>{
+    const q=s=>d.querySelector(s);
+    q("#vf").onclick=closeSheet;
+    q("#vo")&&(q("#vo").onclick=()=>{closeSheet();concluirVisita(x);});
+    q("#ve")&&(q("#ve").onclick=()=>{closeSheet();formVisita(x,null);});
+    q("#vk")&&(q("#vk").onclick=()=>{closeSheet();confirma("Cancelar esta visita?","Ela continua no histórico, marcada como cancelada.","Cancelar visita",async()=>{try{await gravaVisita(x.id,{status:"cancelada"});toast("Visita cancelada.");rota();}catch(e){toast(erroBanco(e));}});});
+    q("#vr")&&(q("#vr").onclick=async()=>{try{await gravaVisita(x.id,{status:"agendada",realizada_em:null});closeSheet();toast("Visita voltou para agendada.");rota();}catch(e){toast(erroBanco(e));}});
+    q("#vd").onclick=()=>{closeSheet();confirma("Excluir esta visita?","Isso apaga a visita e as anotações dela. Não dá para desfazer.","Excluir",async()=>{
+      const{error}=await supa.from("rota_visitas").delete().eq("id",x.id);if(error)return toast(erroBanco(error));
+      S.visitas=S.visitas.filter(v=>v.id!==x.id);toast("Visita excluída.");rota();});};
+  });
+}
+
+/* ---- concluir visita ---- */
+function concluirVisita(x){
+  const c=cliPorId(x.cliente_id);
+  sheet(`<h2>${x.status==="realizada"?"Anotações da visita":"Concluir visita"}</h2><p>${esc(c?nomeCli(c):"")} · ${esc(rotuloData(x.data))}</p>
+    <div class="f"><label for="cr">Como foi?</label><select id="cr">${RESULTADOS.map(r=>`<option ${(x.resultado||RESULTADOS[0])===r?"selected":""}>${esc(r)}</option>`).join("")}</select></div>
+    <div class="f"><label for="cn">Anotações</label><textarea id="cn" placeholder="O que foi conversado, pedidos, próximos passos…">${esc(x.notas)}</textarea></div>
+    ${x.status==="realizada"?"":`<label class="chk"><input type="checkbox" id="cg"> Registrar a minha localização agora (GPS)</label>`}
+    <div class="f" style="margin-top:6px"><label for="cp">Agendar a próxima visita em (opcional)</label><input id="cp" type="date"></div>
+    <div id="cm"></div><div class="actbar"><button class="btn primary" id="cs2">${x.status==="realizada"?"Salvar":"Concluir"}</button><button class="btn sec" id="cx">Cancelar</button></div>`,d=>{
+    const q=s=>d.querySelector(s);
+    q("#cx").onclick=closeSheet;
+    q("#cs2").onclick=async()=>{
+      const b=q("#cs2");b.disabled=true;b.textContent="Salvando…";
+      try{
+        const campos={resultado:q("#cr").value,notas:q("#cn").value.trim()};
+        if(x.status!=="realizada"){campos.status="realizada";campos.realizada_em=new Date().toISOString();}
+        if(q("#cg")&&q("#cg").checked){const p=await pegaGPS();if(p){campos.checkin_lat=p.lat;campos.checkin_lng=p.lng;}else toast("Não foi possível pegar a localização. A visita foi concluída assim mesmo.");}
+        await gravaVisita(x.id,campos);
+        const prox=q("#cp").value;
+        if(prox)await gravaVisita(null,{cliente_id:x.cliente_id,data:prox,representadas:x.representadas||[],assunto:x.assunto||""});
+        closeSheet();toast(prox?"Visita concluída e próxima agendada.":"Visita concluída.");rota();
+      }catch(e){q("#cm").innerHTML=`<div class="msg err">${esc(erroBanco(e))}</div>`;b.disabled=false;b.textContent="Concluir";}
+    };
+  });
+}
+
+/* ---- nova visita / editar ---- */
+function formVisita(x,cliId){
+  const novo=!x;
+  let cli=cliPorId(x?x.cliente_id:cliId)||null;
+  const pad=S.perfil.visita_padrao_min||45;
+  sheet(`<h2>${novo?"Nova visita":"Editar visita"}</h2>
+    <div class="f"><label for="vc">Cliente</label><input id="vc" autocomplete="off" placeholder="Digite o nome do cliente" value="${esc(cli?nomeCli(cli):"")}"><div id="vcl" class="pickbox" hidden></div></div>
+    <div class="grid3"><div class="f"><label for="vd">Data</label><input id="vd" type="date" value="${esc(x?x.data:(AG.dia||hojeISO()))}"></div>
+      <div class="f"><label for="vh">Hora (opcional)</label><input id="vh" type="time" value="${esc(x?hhmm(x.hora):"")}"></div>
+      <div class="f"><label for="vm">Duração (min)</label><input id="vm" inputmode="numeric" value="${x&&x.duracao_min?esc(x.duracao_min):""}" placeholder="${cli&&cli.tempo_visita_min?cli.tempo_visita_min:pad}"></div></div>
+    <div class="f"><label>Visita em nome de (marque uma ou mais empresas)</label><div id="vr"></div></div>
+    <div class="f"><label for="va">Assunto</label><input id="va" value="${esc(x?x.assunto:"")}" placeholder="Ex.: apresentar a linha nova"></div>
+    <div class="f"><label for="vn">Observações</label><textarea id="vn">${esc(x?x.notas:"")}</textarea></div>
+    <div id="vmsg"></div><div class="actbar"><button class="btn primary" id="vs">Salvar</button><button class="btn sec" id="vx">Cancelar</button></div>`,d=>{
+    const q=s=>d.querySelector(s);
+    const desenhaReps=sel=>{
+      q("#vr").innerHTML=S.reps.length?S.reps.map(r=>`<label class="chk"><input type="checkbox" data-vr="${esc(r.id)}" ${sel.includes(r.id)?"checked":""}> ${esc(r.nome)}</label>`).join(""):`<p style="margin:0">Você ainda não cadastrou representadas. <a href="#/representadas">Cadastrar agora</a>.</p>`;
+    };
+    desenhaReps(x?(x.representadas||[]):(cli?(cli.representadas||[]):[]));
+    const inp=q("#vc"),box=q("#vcl");
+    inp.oninput=()=>{
+      if(cli&&inp.value!==nomeCli(cli))cli=null;
+      const t=semAcento(inp.value).trim();
+      if(!t||cli){box.hidden=true;return;}
+      const res=S.clientes.filter(c=>c.ativo).filter(c=>t.split(/\s+/).every(w=>semAcento([c.razao,c.fantasia,c.cidade].join(" ")).includes(w)||(dig(w).length>=3&&dig(c.doc).includes(dig(w))))).slice(0,8);
+      box.innerHTML=res.length?res.map(c=>`<button type="button" data-p="${esc(c.id)}">${esc(nomeCli(c))}<small>${esc([c.cidade,c.uf].filter(Boolean).join("/"))}</small></button>`).join(""):`<button type="button" disabled>Nenhum cliente encontrado</button>`;
+      box.hidden=false;
+      box.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{
+        cli=cliPorId(b.dataset.p);inp.value=nomeCli(cli);box.hidden=true;
+        q("#vm").placeholder=cli.tempo_visita_min?cli.tempo_visita_min:pad;
+        desenhaReps(cli.representadas||[]);
+      });
+    };
+    q("#vx").onclick=closeSheet;
+    q("#vs").onclick=async()=>{
+      const msg=t=>{q("#vmsg").innerHTML=`<div class="msg err">${esc(t)}</div>`;};
+      if(!cli)return msg("Escolha o cliente na lista que aparece ao digitar.");
+      const data=q("#vd").value;if(!data)return msg("Escolha a data da visita.");
+      const mm=q("#vm").value.trim();const dur=mm===""?null:parseInt(mm,10);
+      if(mm!==""&&!(dur>=5&&dur<=480))return msg("A duração deve ficar entre 5 e 480 minutos.");
+      const campos={cliente_id:cli.id,data,hora:q("#vh").value||null,duracao_min:dur,representadas:[...d.querySelectorAll("[data-vr]")].filter(i=>i.checked).map(i=>i.dataset.vr),assunto:q("#va").value.trim(),notas:q("#vn").value.trim()};
+      if(x&&x.status==="cancelada")campos.status="agendada";
+      const b=q("#vs");b.disabled=true;b.textContent="Salvando…";
+      try{await gravaVisita(x?x.id:null,campos);AG.dia=data;AG.mes=data.slice(0,7);closeSheet();toast("Visita salva.");rota();}
+      catch(e){msg(erroBanco(e));b.disabled=false;b.textContent="Salvar";}
+    };
+    if(!cli)inp.focus();
+  });
+}
+
+/* ---- tela da agenda ---- */
+let AG={mes:null,dia:null,aba:"dia",rep:""};
+function telaAgenda(v){
+  const hoje=hojeISO();
+  if(!AG.dia)AG.dia=hoje;
+  if(!AG.mes)AG.mes=AG.dia.slice(0,7);
+  v.innerHTML=`<div class="ph"><div><p class="eyebrow">Agenda</p><h1>Visitas</h1></div><div class="actbar"><button class="btn primary" id="nv">${IC("plus","sm")} Nova visita</button><a class="btn sec" href="#/rota">${IC("route","sm")} Rota do dia</a></div></div>
+    ${S.semVisitas?`<div class="msg warn">A agenda ainda não foi ativada no banco. Rode o arquivo <b>supabase-rota-etapa3.sql</b> no SQL Editor do Supabase.</div>`:""}
+    ${S.reps.length?`<div class="chips" id="chips"><button class="chip ${AG.rep===""?"on":""}" data-r="">Todas as empresas</button>${S.reps.map(r=>`<button class="chip ${AG.rep===r.id?"on":""}" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
+    <div class="agenda"><div class="card" id="cal" style="margin:0"></div><div class="card" id="dia" style="margin:0"></div></div>`;
+  const vis=()=>S.visitas.filter(x=>!AG.rep||(x.representadas||[]).includes(AG.rep));
+  const desenhaCal=()=>{
+    const[Y,M]=AG.mes.split("-").map(Number);
+    const dow=(new Date(Y,M-1,1).getDay()+6)%7,ndias=new Date(Y,M,0).getDate(),celulas=Math.ceil((dow+ndias)/7)*7;
+    const conta={};vis().filter(x=>x.status!=="cancelada").forEach(x=>{conta[x.data]=(conta[x.data]||0)+1;});
+    let html="";
+    for(let i=0;i<celulas;i++){
+      const d=new Date(Y,M-1,1-dow+i),iso=isoLocal(d),fora=d.getMonth()!==M-1;
+      html+=`<button type="button" class="cald ${fora?"fora":""} ${iso===hoje?"hoje":""} ${iso===AG.dia?"sel":""}" data-d="${iso}" aria-label="${esc(rotuloData(iso))}">${d.getDate()}${conta[iso]?`<i>${conta[iso]}</i>`:""}</button>`;
+    }
+    v.querySelector("#cal").innerHTML=`<div class="calh"><button class="iconbtn" id="calprev" aria-label="Mês anterior">${IC("chevron-left")}</button><b>${esc(new Date(Y,M-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"}))}</b><button class="iconbtn" id="calnext" aria-label="Próximo mês">${IC("chevron-right")}</button></div>
+      <div class="calg">${["seg","ter","qua","qui","sex","sáb","dom"].map(s=>`<div class="calw">${s}</div>`).join("")}${html}</div>
+      <div class="actbar" style="margin-top:12px"><button class="btn sec sm" id="calhoje">Ir para hoje</button></div>`;
+    const mover=n=>{const d=new Date(Y,M-1+n,1);AG.mes=isoLocal(d).slice(0,7);desenhaCal();};
+    v.querySelector("#calprev").onclick=()=>mover(-1);v.querySelector("#calnext").onclick=()=>mover(1);
+    v.querySelector("#calhoje").onclick=()=>{AG.dia=hoje;AG.mes=hoje.slice(0,7);AG.aba="dia";desenhaCal();desenhaDia();};
+    v.querySelectorAll(".cald").forEach(b=>b.onclick=()=>{AG.dia=b.dataset.d;AG.aba="dia";if(AG.dia.slice(0,7)!==AG.mes)AG.mes=AG.dia.slice(0,7);desenhaCal();desenhaDia();});
+  };
+  const desenhaDia=()=>{
+    const abas=[["dia","Dia"],["proximas","Próximas"],["feitas","Realizadas"]];
+    let corpo="";
+    if(AG.aba==="dia"){
+      const doDia=vis().filter(x=>x.data===AG.dia).sort((a,b)=>chaveVis(a).localeCompare(chaveVis(b)));
+      corpo=`<div class="sec-h" style="margin:0 0 10px"><h2 class="cap1" style="margin:0">${esc(new Date(AG.dia+"T12:00:00").toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"}))}</h2><a class="btn sec sm" href="#/rota" id="rd">${IC("route","sm")} Rota deste dia</a></div>
+        ${doDia.length?`<div class="list">${doDia.map(x=>linhaVisita(x,{status:1})).join("")}</div>`:`<div class="empty"><p>Nenhuma visita neste dia.</p><button class="btn primary" id="nvd">Agendar para este dia</button></div>`}`;
+    }else if(AG.aba==="proximas"){
+      const lista=vis().filter(x=>x.status==="agendada"&&x.data>=hoje).sort((a,b)=>chaveVis(a).localeCompare(chaveVis(b))).slice(0,80);
+      const grupos=[];lista.forEach(x=>{const g=grupos[grupos.length-1];if(g&&g.d===x.data)g.l.push(x);else grupos.push({d:x.data,l:[x]});});
+      corpo=lista.length?grupos.map(g=>`<div class="sec-h" style="margin:14px 0 8px"><h2 style="margin:0;font-size:15px">${esc(rotuloData(g.d))} <span style="color:var(--n-500);font-weight:500">· ${esc(dataCurta(g.d))}</span></h2></div><div class="list">${g.l.map(x=>linhaVisita(x)).join("")}</div>`).join(""):`<div class="empty"><p>Nenhuma visita agendada daqui para frente.</p><button class="btn primary" id="nvd">Agendar visita</button></div>`;
+      const atr=vis().filter(x=>x.status==="agendada"&&x.data<hoje).sort((a,b)=>chaveVis(a).localeCompare(chaveVis(b)));
+      if(atr.length)corpo=`<div class="msg warn" style="margin-bottom:6px">${atr.length} visita${atr.length>1?"s":""} atrasada${atr.length>1?"s":""} (data passada, ainda agendada):</div><div class="list" style="margin-bottom:12px">${atr.map(x=>linhaVisita(x,{data:1})).join("")}</div>`+corpo;
+    }else{
+      const lista=vis().filter(x=>x.status==="realizada").sort((a,b)=>String(b.realizada_em||b.data).localeCompare(String(a.realizada_em||a.data))).slice(0,80);
+      corpo=lista.length?`<div class="list">${lista.map(x=>linhaVisita(x,{data:1,resultado:1})).join("")}</div>`:`<div class="empty"><p>Ainda não há visitas realizadas.</p></div>`;
+    }
+    v.querySelector("#dia").innerHTML=`<div class="tabs">${abas.map(([k,t])=>`<button class="chip ${AG.aba===k?"on":""}" data-a="${k}">${t}</button>`).join("")}</div>${corpo}`;
+    v.querySelectorAll("#dia [data-a]").forEach(b=>b.onclick=()=>{AG.aba=b.dataset.a;desenhaDia();});
+    v.querySelector("#nvd")&&(v.querySelector("#nvd").onclick=()=>formVisita(null,null));
+    v.querySelector("#rd")&&(v.querySelector("#rd").onclick=()=>{R.data=AG.dia;R.desm=new Set();R.extras=[];R.res=null;});
+    ligaVisitas(v.querySelector("#dia"));
+  };
+  v.querySelector("#nv").onclick=()=>formVisita(null,null);
+  v.querySelectorAll("#chips .chip").forEach(b=>b.onclick=()=>{AG.rep=b.dataset.r;v.querySelectorAll("#chips .chip").forEach(x=>x.classList.toggle("on",x===b));desenhaCal();desenhaDia();});
+  desenhaCal();desenhaDia();
+}
+
+/* ===================== rota do dia (a partir da agenda) ===================== */
+let R={data:null,inicio:"08:00",voltar:true,desm:new Set(),extras:[],res:null,calculando:false};
 function resumoSaida(){return {endereco:[S.perfil.casa_endereco,S.perfil.casa_numero].filter(Boolean).join(", "),lat:S.perfil.casa_lat,lng:S.perfil.casa_lng};}
 
 async function calcularRota(){
   const casa=resumoSaida();
-  const stops=[...R.sel].map(cliPorId).filter(c=>c&&c.lat!=null);
-  const pts=[{lat:casa.lat,lng:casa.lng},...stops.map(c=>({lat:c.lat,lng:c.lng}))];
+  const itens=[];
+  for(const x of S.visitas.filter(x=>x.data===R.data&&x.status==="agendada"&&!R.desm.has(x.id))){
+    const c=cliPorId(x.cliente_id);if(c&&c.lat!=null)itens.push({visita:x,cliente:c});
+  }
+  let criadas=0;
+  for(const cid of R.extras){   // clientes adicionados ao dia viram visitas agendadas
+    const c=cliPorId(cid);if(!c||c.lat==null)continue;
+    const ja=S.visitas.find(x=>x.cliente_id===cid&&x.data===R.data&&x.status==="agendada");
+    if(ja){if(!itens.some(i=>i.visita.id===ja.id))itens.push({visita:ja,cliente:c});continue;}
+    const nv=await gravaVisita(null,{cliente_id:cid,data:R.data,representadas:c.representadas||[]});
+    itens.push({visita:nv,cliente:c});criadas++;
+  }
+  R.extras=[];
+  if(!itens.length)throw new Error("vazio");
+  if(itens.length>25)throw new Error("muitas");
+  const pts=[{lat:casa.lat,lng:casa.lng},...itens.map(i=>({lat:i.cliente.lat,lng:i.cliente.lng}))];
   const M=await matriz(pts);
-  const ord=melhorOrdem(M.dur,stops.length,R.voltar);
+  const ord=melhorOrdem(M.dur,itens.length,R.voltar);
   const padrao=S.perfil.visita_padrao_min||45;
-  let t=horaMin(R.inicio),ant=0,km=0,seg=0,visitas=0;
-  const paradas=[];
+  let t=horaMin(R.inicio),ant=0,km=0,seg=0,visitas=0;const paradas=[];
   ord.forEach((ix,k)=>{
-    const c=stops[ix-1],dm=M.dur[ant][ix]/60;
-    km+=M.dist[ant][ix]/1000;seg+=M.dur[ant][ix];t+=dm;
-    const dur=c.tempo_visita_min||padrao;
-    paradas.push({cliente_id:c.id,ordem:k+1,chegada:Math.round(t),dur,lat:c.lat,lng:c.lng,visitado:false,hora:""});
+    const it=itens[ix-1];
+    km+=M.dist[ant][ix]/1000;seg+=M.dur[ant][ix];t+=M.dur[ant][ix]/60;
+    const dur=it.visita.duracao_min||it.cliente.tempo_visita_min||padrao;
+    paradas.push({visita_id:it.visita.id,cliente_id:it.cliente.id,ordem:k+1,chegada:Math.round(t),dur,lat:it.cliente.lat,lng:it.cliente.lng});
     t+=dur;visitas+=dur;ant=ix;
   });
   let retorno=null;
   if(R.voltar&&ord.length){km+=M.dist[ant][0]/1000;seg+=M.dur[ant][0];t+=M.dur[ant][0]/60;retorno=Math.round(t);}
-  // traçado pelas ruas (só se o serviço de rotas estiver ativo)
   let geometria=null;
   if(M.tipo==="ruas")geometria=await tracado([0,...ord,...(R.voltar?[0]:[])].map(i=>pts[i]),M.fonte);
-  R.res={id:null,paradas,km,minDirigindo:seg/60,minVisitas:visitas,retorno,saida:Math.round(horaMin(R.inicio)),calculo:M.tipo,motivo:M.motivo||"",geometria,voltar:R.voltar,data:R.data,casa};
+  R.res={paradas,km,minDirigindo:seg/60,minVisitas:visitas,retorno,saida:Math.round(horaMin(R.inicio)),calculo:M.tipo,motivo:M.motivo||"",geometria,voltar:R.voltar,data:R.data,casa,criadas};
 }
 
 function telaRota(v){
   if(!R.data)R.data=hojeISO();
   const casaOk=S.perfil.casa_lat!=null;
-  const comLoc=c=>c.ativo&&c.lat!=null;
-  const semLoc=S.clientes.filter(c=>c.ativo&&c.lat==null&&(c.endereco||c.cep||c.cidade)&&c.geo_status!=="falhou").length;
-  v.innerHTML=`<p class="eyebrow">Rota</p><h1>Rota do dia</h1>
-    <p class="lead">Marque os clientes que vai visitar e o app calcula a melhor ordem.</p>
-    ${casaOk?`<div class="card" style="padding:14px 16px"><div class="row between"><div class="grow"><div style="font:600 13px var(--font);color:var(--navy-900)">Saída${R.voltar?" e volta":""}</div><div style="font-size:13px;color:var(--n-500)">${esc(resumoSaida().endereco)} · ${esc(S.perfil.casa_cidade||"")}</div></div><a class="btn sec sm" href="#/casa">Alterar</a></div></div>`
-      :`<div class="msg warn row between"><span>Defina o endereço da sua casa para calcular a rota.</span><a class="btn sec sm" href="#/casa">Definir</a></div>`}
-    ${semLoc?`<div class="msg warn row between"><span>${semLoc} cliente${semLoc>1?"s":""} ainda sem localização.</span><button class="btn sec sm" id="loc">Localizar</button></div>`:""}
-    <div class="card"><h2>Clientes do dia</h2>
-      <div class="search" style="margin-bottom:10px">${IC("search")}<input id="rq" type="search" placeholder="Buscar nome ou cidade" value="${esc(R.q)}" aria-label="Buscar clientes"></div>
-      ${S.reps.length?`<div class="chips" id="rchips"><button class="chip ${R.rep===""?"on":""}" data-r="">Todas</button>${S.reps.map(r=>`<button class="chip ${R.rep===r.id?"on":""}" data-r="${esc(r.id)}">${esc(r.nome)}</button>`).join("")}</div>`:""}
-      <div id="rlista"></div>
-      <p class="lead" id="rcont" style="margin:12px 0 0"></p>
-    </div>
-    <div class="card"><h2>Detalhes</h2>
+  v.innerHTML=`<div class="ph"><div><p class="eyebrow">Rota</p><h1>Rota do dia</h1></div><div class="actbar"><a class="btn sec" href="#/agenda">${IC("calendar-days","sm")} Ver agenda</a></div></div>
+    ${casaOk?"":`<div class="msg warn row between"><span>Defina o endereço da sua casa para calcular a rota.</span><a class="btn sec sm" href="#/casa">Definir</a></div>`}
+    <div class="rotagrid"><div id="rctl"></div><div id="res"></div></div>`;
+  desenhaCtl(v);
+  if(R.res)mostraResultado(v);
+}
+
+function desenhaCtl(v){
+  const casaOk=S.perfil.casa_lat!=null;
+  const box=v.querySelector("#rctl");
+  const vs=S.visitas.filter(x=>x.data===R.data&&x.status==="agendada").sort((a,b)=>chaveVis(a).localeCompare(chaveVis(b)));
+  const feitas=S.visitas.filter(x=>x.data===R.data&&x.status==="realizada").length;
+  const jaNoDia=new Set(vs.map(x=>x.cliente_id));
+  const linhaV=x=>{
+    const c=cliPorId(x.cliente_id),ok=c&&c.lat!=null;
+    const info=[hhmm(x.hora),c&&c.cidade,ok?"":"sem localização",(x.representadas||[]).map(repNome).filter(Boolean).join(", ")].filter(Boolean).join(" · ");
+    return `<label class="pick ${ok?"":"dis"}"><input type="checkbox" data-v="${esc(x.id)}" ${ok&&!R.desm.has(x.id)?"checked":""} ${ok?"":"disabled"}><div class="grow"><div style="font-weight:600;color:var(--navy-900)">${esc(c?nomeCli(c):"Cliente removido")}</div><div style="font-size:13px;color:var(--n-500)">${esc(info)}</div></div></label>`;
+  };
+  const linhaE=id=>{const c=cliPorId(id);return c?`<label class="pick"><input type="checkbox" data-e="${esc(id)}" checked><div class="grow"><div style="font-weight:600;color:var(--navy-900)">${esc(nomeCli(c))}</div><div style="font-size:13px;color:var(--n-500)">${esc(c.cidade||"")} · será adicionado à agenda deste dia</div></div></label>`:"";};
+  box.innerHTML=`<div class="card"><h2>Dia e saída</h2>
       <div class="grid2"><div class="f"><label for="r_data">Data</label><input id="r_data" type="date" value="${esc(R.data)}"></div><div class="f"><label for="r_ini">Hora de saída</label><input id="r_ini" type="time" value="${esc(R.inicio)}"></div></div>
       <label class="chk"><input type="checkbox" id="r_volta" ${R.voltar?"checked":""}> Voltar para casa no fim</label>
-    </div>
-    <button class="btn primary block" id="calc" style="height:54px">Calcular melhor rota</button>
-    <div id="res" style="margin-top:22px"></div>
-    ${S.rotas.length?`<div class="sec-h"><h2>Rotas salvas</h2></div><div class="list">${S.rotas.slice(0,8).map(r=>`<div class="item" data-rt="${esc(r.id)}"><span class="avatar">${IC("route")}</span><div class="grow"><div class="t">${esc(fmtDiaSemana(r.data))}</div><div class="d">${(r.paradas||[]).length} visita(s)${r.total_km!=null?" · "+fmtKm(+r.total_km):""} · ${(r.paradas||[]).filter(p=>p.visitado).length} feita(s)</div></div>${IC("chevron-right","sm")}</div>`).join("")}</div>`:""}`;
-  const cont=()=>{v.querySelector("#rcont").textContent=R.sel.size?`${R.sel.size} selecionado(s)`:"Nenhum cliente selecionado.";v.querySelector("#calc").disabled=!casaOk||!R.sel.size||R.calculando;};
-  const lista=()=>{
-    const q=semAcento(R.q).trim();
-    const cs=S.clientes.filter(c=>c.ativo).filter(c=>!R.rep||(c.representadas||[]).includes(R.rep))
-      .filter(c=>!q||q.split(/\s+/).every(w=>semAcento([c.razao,c.fantasia,c.cidade,c.bairro].join(" ")).includes(w)))
-      .sort((a,b)=>nomeCli(a).localeCompare(nomeCli(b),"pt-BR"));
-    v.querySelector("#rlista").innerHTML=cs.length?`<div style="border:1px solid var(--n-200);border-radius:16px;overflow:hidden;max-height:360px;overflow-y:auto">${cs.slice(0,300).map(c=>`<label class="pick ${comLoc(c)?"":"dis"}"><input type="checkbox" data-c="${esc(c.id)}" ${R.sel.has(c.id)?"checked":""} ${comLoc(c)?"":"disabled"}><div class="grow"><div class="t" style="font-weight:600;color:var(--navy-900)">${esc(nomeCli(c))}</div><div class="d" style="font-size:13px;color:var(--n-500)">${esc([c.cidade,ROT_GEO[c.geo_status]||(c.lat==null?"sem localização":"")].filter(Boolean).join(" · "))}</div></div></label>`).join("")}</div>`
-      :`<div class="empty"><p>Nenhum cliente encontrado.</p></div>`;
-    v.querySelectorAll("#rlista [data-c]").forEach(i=>i.onchange=()=>{i.checked?R.sel.add(i.dataset.c):R.sel.delete(i.dataset.c);cont();});
+      ${casaOk?`<p style="margin:6px 0 0;font-size:13px">Saída: ${esc(resumoSaida().endereco)} · ${esc(S.perfil.casa_cidade||"")} · <a href="#/casa">alterar</a></p>`:""}</div>
+    <div class="card"><div class="sec-h" style="margin-top:0"><h2 class="cap1" style="margin:0">Visitas de ${esc(rotuloData(R.data).toLowerCase())}</h2><button class="btn sec sm" id="nvr">${IC("plus","sm")} Nova visita</button></div>
+      ${vs.length||R.extras.length?`<div style="border:1px solid var(--n-200);border-radius:16px;overflow:hidden">${vs.map(linhaV).join("")}${R.extras.map(linhaE).join("")}</div>`:`<p style="margin:0">Nenhuma visita agendada neste dia. Agende pela agenda ou adicione clientes logo abaixo.</p>`}
+      ${feitas?`<p style="margin:10px 0 0;font-size:13px">${feitas} visita${feitas>1?"s":""} deste dia já realizada${feitas>1?"s":""}.</p>`:""}</div>
+    <div class="card"><h2>Adicionar clientes a este dia</h2><div class="f" style="margin:0"><input id="rb" placeholder="Buscar cliente por nome ou cidade" autocomplete="off" aria-label="Buscar cliente"><div id="rbl" class="pickbox" hidden></div></div></div>
+    <button class="btn primary block" id="calc" style="height:54px" ${casaOk?"":"disabled"}>Calcular melhor rota</button>`;
+  const q=s=>box.querySelector(s);
+  q("#r_data").onchange=e=>{R.data=e.target.value||hojeISO();R.desm=new Set();R.extras=[];R.res=null;v.querySelector("#res").innerHTML="";desenhaCtl(v);};
+  q("#r_ini").onchange=e=>{R.inicio=e.target.value||"08:00";};
+  q("#r_volta").onchange=e=>{R.voltar=e.target.checked;};
+  q("#nvr").onclick=()=>{AG.dia=R.data;formVisita(null,null);};
+  box.querySelectorAll("[data-v]").forEach(i=>i.onchange=()=>{i.checked?R.desm.delete(i.dataset.v):R.desm.add(i.dataset.v);});
+  box.querySelectorAll("[data-e]").forEach(i=>i.onchange=()=>{if(!i.checked){R.extras=R.extras.filter(id=>id!==i.dataset.e);desenhaCtl(v);}});
+  const rb=q("#rb"),rbl=q("#rbl");
+  rb.oninput=()=>{
+    const t=semAcento(rb.value).trim();if(!t){rbl.hidden=true;return;}
+    const res=S.clientes.filter(c=>c.ativo&&!jaNoDia.has(c.id)&&!R.extras.includes(c.id)).filter(c=>t.split(/\s+/).every(w=>semAcento([c.razao,c.fantasia,c.cidade].join(" ")).includes(w))).slice(0,8);
+    rbl.innerHTML=res.length?res.map(c=>`<button type="button" data-p="${esc(c.id)}" ${c.lat==null?"disabled":""}>${esc(nomeCli(c))}<small>${esc([c.cidade,c.uf].filter(Boolean).join("/"))}${c.lat==null?" · sem localização":""}</small></button>`).join(""):`<button type="button" disabled>Nenhum cliente encontrado</button>`;
+    rbl.hidden=false;
+    rbl.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{R.extras.push(b.dataset.p);desenhaCtl(v);});
   };
-  v.querySelector("#rq").oninput=e=>{R.q=e.target.value;lista();};
-  v.querySelectorAll("#rchips .chip").forEach(b=>b.onclick=()=>{R.rep=b.dataset.r;v.querySelectorAll("#rchips .chip").forEach(x=>x.classList.toggle("on",x===b));lista();});
-  v.querySelector("#r_data").onchange=e=>{R.data=e.target.value||hojeISO();};
-  v.querySelector("#r_ini").onchange=e=>{R.inicio=e.target.value||"08:00";};
-  v.querySelector("#r_volta").onchange=e=>{R.voltar=e.target.checked;};
-  v.querySelector("#loc")&&(v.querySelector("#loc").onclick=()=>abreLocalizacao(()=>telaRota(v)));
-  v.querySelectorAll("[data-rt]").forEach(e=>e.onclick=async()=>{
-    const r=S.rotas.find(x=>x.id===e.dataset.rt);if(!r)return;
-    const sd=r.saida||{};
-    R.res={id:r.id,paradas:(r.paradas||[]).map(p=>({...p})),km:+r.total_km||0,minDirigindo:sd.min_dirigindo||0,minVisitas:sd.min_visitas||0,retorno:sd.retorno||null,saida:sd.inicio||480,calculo:r.calculo,motivo:"",geometria:null,voltar:!!sd.volta,data:r.data,casa:{endereco:sd.endereco||"",lat:sd.lat,lng:sd.lng}};
-    await mostraResultado(v);v.querySelector("#res").scrollIntoView({behavior:"smooth"});
-  });
-  v.querySelector("#calc").onclick=async()=>{
-    if(R.sel.size>25)return toast("Escolha no máximo 25 clientes por rota.");
-    const b=v.querySelector("#calc");R.calculando=true;b.disabled=true;b.textContent="Calculando…";
-    try{await calcularRota();await mostraResultado(v);v.querySelector("#res").scrollIntoView({behavior:"smooth"});}
-    catch(e){toast("Não foi possível calcular a rota. Tente de novo.");}
-    finally{R.calculando=false;b.textContent="Calcular melhor rota";cont();}
+  q("#calc").onclick=async()=>{
+    const b=q("#calc");R.calculando=true;b.disabled=true;b.textContent="Calculando…";
+    try{await calcularRota();desenhaCtl(v);await mostraResultado(v);if(R.res&&R.res.criadas)toast(R.res.criadas+" visita(s) adicionada(s) à agenda.");v.querySelector("#res").scrollIntoView({behavior:"smooth"});}
+    catch(e){toast(e.message==="vazio"?"Marque pelo menos uma visita com localização.":e.message==="muitas"?"Escolha no máximo 25 visitas por rota.":erroBanco(e));}
+    finally{R.calculando=false;const bb=v.querySelector("#calc");if(bb){bb.disabled=!casaOk;bb.textContent="Calcular melhor rota";}}
   };
-  lista();cont();
-  if(R.res)mostraResultado(v);
 }
 
 async function mostraResultado(v){
   const res=R.res,box=v.querySelector("#res");if(!res||!box)return;
+  const vis=res.paradas.map(p=>S.visitas.find(x=>x.id===p.visita_id));
   const nomes=res.paradas.map(p=>cliPorId(p.cliente_id));
   const trechos=[];
   {const pts=res.paradas.map(p=>({lat:p.lat,lng:p.lng}));if(res.voltar&&res.casa&&res.casa.lat!=null)pts.push({lat:res.casa.lat,lng:res.casa.lng});
    let origem={lat:res.casa.lat,lng:res.casa.lng};
    for(let i=0;i<pts.length;i+=10){const bl=pts.slice(i,i+10),dest=bl[bl.length-1],way=bl.slice(0,-1);
-     trechos.push({de:i+1,ate:Math.min(i+10,res.paradas.length),url:`https://www.google.com/maps/dir/?api=1&origin=${origem.lat},${origem.lng}&destination=${dest.lat},${dest.lng}${way.length?"&waypoints="+encodeURIComponent(way.map(w=>w.lat+","+w.lng).join("|")):""}&travelmode=driving`});origem=dest;}}
+     trechos.push({url:`https://www.google.com/maps/dir/?api=1&origin=${origem.lat},${origem.lng}&destination=${dest.lat},${dest.lng}${way.length?"&waypoints="+encodeURIComponent(way.map(w=>w.lat+","+w.lng).join("|")):""}&travelmode=driving`});origem=dest;}}
   box.innerHTML=`<div class="eyebrow">Sua rota</div><h2 style="font-size:20px;margin-bottom:12px">${esc(fmtDiaSemana(res.data))} · ${res.paradas.length} visita${res.paradas.length>1?"s":""}</h2>
     ${res.calculo==="estimativa"?`<div class="msg warn">O serviço de rotas pelas ruas não respondeu agora, então mostramos uma estimativa pela distância em linha reta. Tente calcular de novo em instantes.</div>`:""}
-    <div class="kpis"><div class="kpi"><b>${esc(fmtKm(res.km))}</b><span>Distância total</span></div><div class="kpi"><b>${esc(fmtDur(res.minDirigindo))}</b><span>Dirigindo</span></div>
+    <div class="kpis4"><div class="kpi"><b>${esc(fmtKm(res.km))}</b><span>Distância total</span></div><div class="kpi"><b>${esc(fmtDur(res.minDirigindo))}</b><span>Dirigindo</span></div>
       <div class="kpi"><b>${esc(fmtDur(res.minVisitas))}</b><span>Em visitas</span></div><div class="kpi"><b>${res.retorno!=null?esc(minHora(res.retorno)):"—"}</b><span>${res.voltar?"Volta prevista":"Saída "+esc(minHora(res.saida))}</span></div></div>
     <div id="rmapa" class="mapbox"></div>
-    <div class="list" id="rparadas">${res.paradas.map((p,i)=>{const c=nomes[i];return `<div class="stop ${p.visitado?"feito":""}"><span class="num">${p.ordem}</span><div class="grow"><div class="t">${esc(c?nomeCli(c):"Cliente removido")}</div>
+    <div class="list" id="rparadas">${res.paradas.map((p,i)=>{const c=nomes[i],x=vis[i],feita=x&&x.status==="realizada";return `<div class="stop ${feita?"feito":""}"><span class="num">${p.ordem}</span><div class="grow"><div class="t">${esc(c?nomeCli(c):"Cliente removido")}</div>
       <div class="d">Chega ${esc(minHora(p.chegada))} · fica ${esc(fmtDur(p.dur))}${c?"<br>"+esc(enderecoLinha(c)):""}</div>
-      <div class="acts"><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkWaze(p))}">Waze</a><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkMaps(p))}">Google Maps</a>
-      <label class="chk" style="min-height:40px"><input type="checkbox" data-v="${i}" ${p.visitado?"checked":""}> Visitado${p.visitado&&p.hora?" às "+esc(p.hora):""}</label></div></div></div>`;}).join("")}</div>
-    <div class="actbar" style="margin-top:14px">${trechos.length?trechos.map((t,i)=>`<a class="btn sec" target="_blank" rel="noopener" href="${esc(t.url)}">${IC("route","sm")} ${trechos.length>1?"Google Maps — trecho "+(i+1):"Abrir toda a rota no Google Maps"}</a>`).join(""):""}
-      <button class="btn primary" id="salvaRota" ${res.id?"disabled":""}>${res.id?"Rota salva":"Salvar rota"}</button></div>`;
-  box.querySelectorAll("[data-v]").forEach(i=>i.onchange=async()=>{
-    const p=res.paradas[+i.dataset.v];p.visitado=i.checked;p.hora=i.checked?minHora(new Date().getHours()*60+new Date().getMinutes()):"";
-    if(res.id){
-      const upd=await supa.from("rota_rotas").update({paradas:res.paradas.map(x=>({cliente_id:x.cliente_id,ordem:x.ordem,chegada:x.chegada,dur:x.dur,lat:x.lat,lng:x.lng,visitado:x.visitado,hora:x.hora||""}))}).eq("id",res.id).select().single();
-      if(upd.error)toast(erroBanco(upd.error));else{const r=S.rotas.find(x=>x.id===res.id);if(r)Object.assign(r,upd.data);}
-    }
-    mostraResultado(v);
+      <div class="acts"><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkWaze(p))}">Waze</a><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkMaps(p))}">Google Maps</a><button class="btn sec sm" data-det="${i}">Detalhes</button>
+      <label class="chk" style="min-height:40px"><input type="checkbox" data-f="${i}" ${feita?"checked":""}> Visitado</label></div></div></div>`;}).join("")}</div>
+    <div class="actbar" style="margin-top:14px">${trechos.map((t,i)=>`<a class="btn sec" target="_blank" rel="noopener" href="${esc(t.url)}">${IC("route","sm")} ${trechos.length>1?"Google Maps — trecho "+(i+1):"Abrir toda a rota no Google Maps"}</a>`).join("")}
+      <button class="btn primary" id="aplica">${IC("calendar-days","sm")} Aplicar horários na agenda</button></div>`;
+  box.querySelectorAll("[data-det]").forEach(b=>b.onclick=()=>abreVisita(res.paradas[+b.dataset.det].visita_id));
+  box.querySelectorAll("[data-f]").forEach(i=>i.onchange=async()=>{
+    const p=res.paradas[+i.dataset.f],x=S.visitas.find(z=>z.id===p.visita_id);if(!x)return;
+    try{await gravaVisita(x.id,i.checked?{status:"realizada",resultado:x.resultado||RESULTADOS[0],realizada_em:new Date().toISOString()}:{status:"agendada",realizada_em:null});mostraResultado(v);}
+    catch(e){toast(erroBanco(e));i.checked=!i.checked;}
   });
-  box.querySelector("#salvaRota").onclick=async()=>{
-    const b=box.querySelector("#salvaRota");b.disabled=true;b.textContent="Salvando…";
-    const reg={data:res.data,titulo:"",saida:{endereco:res.casa.endereco,lat:res.casa.lat,lng:res.casa.lng,volta:res.voltar,inicio:res.saida,retorno:res.retorno,min_dirigindo:Math.round(res.minDirigindo),min_visitas:Math.round(res.minVisitas)},
-      paradas:res.paradas.map(x=>({cliente_id:x.cliente_id,ordem:x.ordem,chegada:x.chegada,dur:x.dur,lat:x.lat,lng:x.lng,visitado:x.visitado,hora:x.hora||""})),total_km:+res.km.toFixed(1),total_min:Math.round(res.minDirigindo+res.minVisitas),calculo:res.calculo};
-    const{data,error}=await supa.from("rota_rotas").insert(reg).select().single();
-    if(error){b.disabled=false;b.textContent="Salvar rota";return toast(erroBanco(error));}
-    res.id=data.id;S.rotas.unshift(data);toast("Rota salva.");mostraResultado(v);
+  box.querySelector("#aplica").onclick=async()=>{
+    const b=box.querySelector("#aplica");b.disabled=true;b.textContent="Aplicando…";
+    try{for(const p of res.paradas)await gravaVisita(p.visita_id,{hora:minHora(p.chegada),ordem:p.ordem});toast("Horários e ordem aplicados na agenda.");}
+    catch(e){toast(erroBanco(e));}
+    b.disabled=false;b.innerHTML=`${IC("calendar-days","sm")} Aplicar horários na agenda`;
   };
   // mapa da rota
   if(!(await carregaLeaflet())){box.querySelector("#rmapa").innerHTML='<div class="msg err" style="margin:14px">Não foi possível carregar o mapa.</div>';return;}
   const m=novoMapa(box.querySelector("#rmapa"));const ll=[];
   if(res.casa&&res.casa.lat!=null){L.marker([res.casa.lat,res.casa.lng],{icon:pino("C","#001030")}).addTo(m).bindPopup("Saída");ll.push([res.casa.lat,res.casa.lng]);}
-  res.paradas.forEach((p,i)=>{const c=nomes[i];L.marker([p.lat,p.lng],{icon:pino(p.ordem,p.visitado?"#8a97a8":"#008048")}).addTo(m).bindPopup(esc(c?nomeCli(c):"Parada "+p.ordem));ll.push([p.lat,p.lng]);});
-  if(res.geometria){const g=L.geoJSON(res.geometria,{style:{color:"#0090f8",weight:4,opacity:.85}}).addTo(m);}
+  res.paradas.forEach((p,i)=>{const c=nomes[i],x=vis[i];L.marker([p.lat,p.lng],{icon:pino(p.ordem,x&&x.status==="realizada"?"#8a97a8":"#008048")}).addTo(m).bindPopup(esc(c?nomeCli(c):"Parada "+p.ordem));ll.push([p.lat,p.lng]);});
+  if(res.geometria)L.geoJSON(res.geometria,{style:{color:"#0090f8",weight:4,opacity:.85}}).addTo(m);
   else if(ll.length>1){const linha=res.voltar&&res.casa&&res.casa.lat!=null?[...ll,ll[0]]:ll;L.polyline(linha,{color:"#0090f8",weight:3,opacity:.7,dashArray:"6 8"}).addTo(m);}
   if(ll.length)m.fitBounds(L.latLngBounds(ll).pad(0.2),{maxZoom:15});
   setTimeout(()=>m.invalidateSize(),200);
@@ -1254,6 +1593,7 @@ async function iniciar(){
   $("#a-form").addEventListener("submit",enviarAuth);
   $("#b-mode").onclick=()=>telaAuth(modoAuth==="criar"?"entrar":"criar");
   $("#b-forgot").onclick=esqueci;
+  $("#b-sair").onclick=sair;
   supa.auth.onAuthStateChange(ev=>{if(ev==="PASSWORD_RECOVERY")telaAuth("nova");});
   // veio do link "esqueci a senha": mostra a tela de senha nova em vez de abrir o app
   if(/type=recovery/.test(location.hash+location.search)){telaAuth("nova");return;}

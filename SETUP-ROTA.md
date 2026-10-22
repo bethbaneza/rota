@@ -95,3 +95,17 @@ Sem a chave, o app continua funcionando: calcula uma estimativa pela distÃ¢ncia 
 
 ## Plano B sem chave (OSRM)
 Se a chave do OpenRouteService não estiver configurada ou o serviço estiver fora do ar, o app usa o OSRM (serviço público e gratuito do OpenStreetMap, sem cadastro) para calcular distâncias e o traçado pelas ruas. Se nenhum dos dois responder, mostra uma estimativa pela distância em linha reta e avisa na tela.
+
+---
+
+# Etapa 3 — Agenda, painel e novo layout
+
+## Rodar o SQL
+SQL Editor -> cole supabase-rota-etapa3.sql -> Run. As 2 linhas finais precisam dizer **ok**.
+
+## O que mudou
+- **Início:** visitas de hoje, próximos 7 dias, atrasadas, as **próximas visitas**, as **últimas 5 visitas** e os clientes que passaram do intervalo de visita.
+- **Agenda:** calendário do mês + lista do dia; abas Dia / Próximas / Realizadas; filtro por empresa representada. Cada visita pode ser em nome de **mais de uma empresa**.
+- **Clientes:** só o cadastro (empresa, endereço, contatos, preferências) + histórico de visitas do cliente. No computador, a lista vira tabela larga.
+- **Rota do dia:** parte das visitas agendadas do dia; clientes adicionados na hora viram visitas; **Aplicar horários na agenda** grava a ordem e o horário previsto; marcar **Visitado** conclui a visita.
+- **Layout:** no computador usa a tela inteira, com menu lateral e formulários em colunas; no celular, barra de baixo.
