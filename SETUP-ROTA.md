@@ -92,3 +92,6 @@ Sem a chave, o app continua funcionando: calcula uma estimativa pela distÃ¢ncia 
 - **Rota:** marque os clientes do dia, escolha a data e a hora de saÃ­da e toque em **Calcular melhor rota**.
   A rota mostra a ordem, o horÃ¡rio previsto de cada parada, a distÃ¢ncia e o tempo; abre no Waze/Google Maps; **Salvar rota**
   guarda o dia e permite marcar cada visita como feita.
+
+## Plano B sem chave (OSRM)
+Se a chave do OpenRouteService não estiver configurada ou o serviço estiver fora do ar, o app usa o OSRM (serviço público e gratuito do OpenStreetMap, sem cadastro) para calcular distâncias e o traçado pelas ruas. Se nenhum dos dois responder, mostra uma estimativa pela distância em linha reta e avisa na tela.
