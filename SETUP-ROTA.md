@@ -109,3 +109,18 @@ SQL Editor → cole `supabase-rota-etapa3.sql` → Run. As 2 linhas finais preci
 - **Clientes:** só o cadastro (empresa, endereço, contatos, preferências) + histórico de visitas do cliente. No computador, a lista vira tabela larga.
 - **Rota do dia:** parte das visitas agendadas do dia; clientes adicionados na hora viram visitas; **Aplicar horários na agenda** grava a ordem e o horário previsto; marcar **Visitado** conclui a visita.
 - **Layout:** no computador usa a tela inteira, com menu lateral e formulários em colunas; no celular, barra de baixo.
+
+---
+
+# Etapa 4 — Valor das vendas e comissão estimada
+
+## Rodar o SQL
+SQL Editor → cole `supabase-rota-etapa4.sql` → Run. A linha final precisa dizer **ok**.
+
+## Como usar
+- Ao **concluir uma visita** (ou editar as anotações dela), há o bloco **Venda (opcional)**: um campo de valor para cada empresa da visita.
+  Só o valor dos produtos, **sem frete e instalação**. Em branco = não houve venda.
+- Em **Representadas**, informe a **comissão (%)** de cada empresa.
+- Em **Relatórios**: Resumo (vendas, comissão estimada, venda média), **Por empresa** (vendas, % e comissão estimada),
+  por mês, por semana, por cliente e na lista de visitas. A comissão estimada = valor vendido × percentual da empresa.
+- Empresas sem percentual cadastrado não entram no cálculo da comissão (o relatório avisa).

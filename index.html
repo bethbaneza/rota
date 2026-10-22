@@ -396,6 +396,7 @@ const repNome=id=>(S.reps.find(r=>r.id===id)||{}).nome||"";
 function erroBanco(e){
   const m=String((e&&e.message)||e||"");
   if(/rota_clientes_doc_uk|duplicate key/i.test(m))return "Já existe um cliente com este CNPJ/CPF.";
+  if(/vendas/i.test(m)&&/column|schema cache/i.test(m))return "O banco ainda não tem o campo de vendas. Rode o arquivo supabase-rota-etapa4.sql no SQL Editor do Supabase.";
   if(/rota_visitas|checkin_(lat|lng)/i.test(m))return "A agenda ainda não foi ativada no banco. Rode o arquivo supabase-rota-etapa3.sql no SQL Editor do Supabase.";
   // campos e tabela da Etapa 2 (mapa e rota) ainda não criados
   if(/geo_status|casa_(lat|lng|cep|endereco|numero|bairro|cidade|uf)|visita_padrao_min|rota_rotas/i.test(m))return "O banco ainda não tem os campos do mapa e da rota. Rode o arquivo supabase-rota-etapa2.sql no SQL Editor do Supabase.";
@@ -1322,6 +1323,7 @@ function abreVisita(id){
     ${c?`<p style="margin-bottom:8px">${esc(enderecoLinha(c))||"Sem endereço cadastrado"}</p>`:""}
     ${x.assunto?`<p><b>Assunto:</b> ${esc(x.assunto)}</p>`:""}
     ${x.resultado?`<p><b>Resultado:</b> ${esc(x.resultado)}</p>`:""}
+    ${temVenda(x)?`<p><b>Venda:</b> ${esc(textoVendas(x))}</p>`:""}
     ${x.notas?`<p style="white-space:pre-wrap">${esc(x.notas)}</p>`:""}
     <div class="actbar" style="margin-bottom:10px">${botoes}</div>
     <div class="actbar">${c?`<a class="btn sec sm" href="#/clientes/${esc(c.id)}">Abrir cliente</a>`:""}${c&&c.lat!=null?`<a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkWaze(c))}">Waze</a><a class="btn sec sm" target="_blank" rel="noopener" href="${esc(lnkMaps(c))}">Google Maps</a>`:""}${hrefWpp(c&&(c.celular||c.tel))?`<a class="btn sec sm" target="_blank" rel="noopener" href="${esc(hrefWpp(c.celular||c.tel))}">WhatsApp</a>`:""}<button class="btn danger sm" id="vd">Excluir</button><button class="btn sec sm" id="vf">Fechar</button></div>`,d=>{
@@ -1340,9 +1342,12 @@ function abreVisita(id){
 /* ---- concluir visita ---- */
 function concluirVisita(x){
   const c=cliPorId(x.cliente_id);
+  // venda (opcional): um campo por empresa da visita; sem empresa, um campo só
+  const camposVenda=((x.representadas||[]).length?x.representadas:["_"]).map(id=>`<div class="f"><label for="vd_${id}">Valor vendido${id==="_"?"":" — "+esc(repNome(id))} (R$)</label><input id="vd_${id}" data-vd="${esc(id)}" inputmode="decimal" placeholder="0,00" value="${x.vendas&&+x.vendas[id]>0?esc(money(x.vendas[id])):""}">${id!=="_"&&comRep(id)!=null?`<span class="hint">Comissão combinada: ${esc(String(comRep(id)).replace(".",","))}%</span>`:""}</div>`).join("");
   sheet(`<h2>${x.status==="realizada"?"Anotações da visita":"Concluir visita"}</h2><p>${esc(c?nomeCli(c):"")} · ${esc(rotuloData(x.data))}</p>
     <div class="f"><label for="cr">Como foi?</label><select id="cr">${RESULTADOS.map(r=>`<option ${(x.resultado||RESULTADOS[0])===r?"selected":""}>${esc(r)}</option>`).join("")}</select></div>
     <div class="f"><label for="cn">Anotações</label><textarea id="cn" placeholder="O que foi conversado, pedidos, próximos passos…">${esc(x.notas)}</textarea></div>
+    <p style="margin:6px 0 8px"><b>Venda</b> (opcional): só o valor dos produtos, sem frete e instalação. Deixe em branco se não houve venda.</p>${camposVenda}
     ${x.status==="realizada"?"":`<label class="chk"><input type="checkbox" id="cg"> Registrar a minha localização agora (GPS)</label>`}
     <div class="f" style="margin-top:6px"><label for="cp">Agendar a próxima visita em (opcional)</label><input id="cp" type="date"></div>
     <div id="cm"></div><div class="actbar"><button class="btn primary" id="cs2">${x.status==="realizada"?"Salvar":"Concluir"}</button><button class="btn sec" id="cx">Cancelar</button></div>`,d=>{
@@ -1352,13 +1357,17 @@ function concluirVisita(x){
       const b=q("#cs2");b.disabled=true;b.textContent="Salvando…";
       try{
         const campos={resultado:q("#cr").value,notas:q("#cn").value.trim()};
+        const vendas={};let invalido=false;
+        d.querySelectorAll("[data-vd]").forEach(i=>{const n=parseMoney(i.value);if(Number.isNaN(n))invalido=true;else if(n>0)vendas[i.dataset.vd]=n;});
+        if(invalido)throw Object.assign(new Error("O valor da venda está inválido. Use só números, por exemplo 1.500,00."),{validacao:true});
+        if(Object.keys(vendas).length||temVenda(x))campos.vendas=vendas;   // só envia o campo quando há venda (ou para limpar uma antiga)
         if(x.status!=="realizada"){campos.status="realizada";campos.realizada_em=new Date().toISOString();}
         if(q("#cg")&&q("#cg").checked){const p=await pegaGPS();if(p){campos.checkin_lat=p.lat;campos.checkin_lng=p.lng;}else toast("Não foi possível pegar a localização. A visita foi concluída assim mesmo.");}
         await gravaVisita(x.id,campos);
         const prox=q("#cp").value;
         if(prox)await gravaVisita(null,{cliente_id:x.cliente_id,data:prox,representadas:x.representadas||[],assunto:x.assunto||""});
         closeSheet();toast(prox?"Visita concluída e próxima agendada.":"Visita concluída.");rota();
-      }catch(e){q("#cm").innerHTML=`<div class="msg err">${esc(erroBanco(e))}</div>`;b.disabled=false;b.textContent="Concluir";}
+      }catch(e){q("#cm").innerHTML=`<div class="msg err">${esc(e&&e.validacao?e.message:erroBanco(e))}</div>`;b.disabled=false;b.textContent=x.status==="realizada"?"Salvar":"Concluir";}
     };
   });
 }
@@ -1606,6 +1615,22 @@ async function mostraResultado(v){
   setTimeout(()=>m.invalidateSize(),200);
 }
 
+/* ===================== vendas e comissão ===================== */
+// valor da venda: só dos produtos (sem frete e instalação). Guardado por empresa em visita.vendas = {"<id da representada>": valor}
+function parseMoney(s){
+  const orig=String(s==null?"":s).trim();s=orig.replace(/[^\d.,-]/g,"");
+  if(!s)return orig?NaN:null;   // campo vazio = sem venda; texto sem número = valor inválido
+  if(s.includes(","))s=s.replace(/\./g,"").replace(",",".");
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,"");   // "1.234" = mil duzentos e trinta e quatro
+  const n=parseFloat(s);return isFinite(n)&&n>=0?Math.round(n*100)/100:NaN;
+}
+const money=n=>(+n||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const comRep=id=>{const r=S.reps.find(x=>x.id===id);return r&&r.comissao!=null?+r.comissao:null;};
+const temVenda=x=>Object.values(x.vendas||{}).some(v=>+v>0);
+function textoVendas(x){
+  return Object.entries(x.vendas||{}).filter(([,v])=>+v>0).map(([k,v])=>(k==="_"?"":repNome(k)+": ")+"R$ "+money(v)).join(" · ");
+}
+
 /* ===================== relatórios ===================== */
 const REL={per:"mes",de:"",ate:"",rep:"",st:"realizada",aba:"resumo",csv:null};
 const MESES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
@@ -1641,11 +1666,25 @@ function resumoDe(l){
   const r=l.filter(x=>eh(x,"realizada")),c=l.filter(x=>eh(x,"cancelada")),a=l.filter(x=>eh(x,"agendada")),p=r.filter(pedido);
   return{total:l.length,real:r.length,canc:c.length,agend:a.length,pedidos:p.length,neg:r.filter(x=>x.resultado==="Pedido em negociação").length,clientes:distintos(r),min:r.reduce((s,x)=>s+(x.duracao_min||0),0)};
 }
+// soma das vendas e comissão estimada (valor × % da empresa). soRep = só uma empresa; sem % cadastrado = sem comissão calculada
+function vendasDe(l,soRep){
+  let valor=0,com=0,semCom=false,n=0;
+  l.forEach(x=>{
+    if(x.status!=="realizada")return;
+    Object.entries(x.vendas||{}).forEach(([k,v])=>{
+      if(soRep&&k!==soRep)return;if(REL.rep&&k!==REL.rep)return;
+      const val=+v||0;if(val<=0)return;
+      valor+=val;n++;
+      const c=comRep(k);if(c==null)semCom=true;else com+=val*c/100;
+    });
+  });
+  return{valor,com,semCom,n};
+}
 const pct=(a,b)=>b?Math.round(a/b*100)+"%":"—";
 
 function barras(itens,max){
   const m=max||Math.max(1,...itens.map(i=>i[1]));
-  return `<div class="bars">${itens.map(([rot,val,extra])=>`<div class="bar"><span class="bl">${esc(rot)}</span><span class="bt"><i style="width:${Math.round(val/m*100)}%"></i></span><span class="bv">${val}${extra?` <small>${esc(extra)}</small>`:""}</span></div>`).join("")}</div>`;
+  return `<div class="bars">${itens.map(([rot,val,extra])=>`<div class="bar"><span class="bl">${esc(rot)}</span><span class="bt"><i style="width:${Math.round(val/m*100)}%"></i></span><span class="bv">${extra!=null?esc(extra):val}</span></div>`).join("")}</div>`;
 }
 function tabelaRel(cols,linhas,nome){
   REL.csv={nome,cols,linhas};
@@ -1684,50 +1723,60 @@ function telaRelatorios(v){
 function corpoRel(box,d){
   const{vis,base}=d,R_=resumoDe(vis);
   let html="";
+  const aviso=vd=>vd.semCom?`<div class="msg warn" style="margin-top:12px">Há vendas de empresas sem comissão cadastrada, que não entram na comissão estimada. Defina o percentual em <a href="#/representadas">Representadas</a>.</div>`:"";
   if(REL.aba==="resumo"){
-    const todas=resumoDe(base);
+    const todas=resumoDe(base),vd=vendasDe(vis);
     const porRes={};vis.filter(x=>eh(x,"realizada")).forEach(x=>{const k=x.resultado||"Sem resultado";porRes[k]=(porRes[k]||0)+1;});
     const meses={};vis.forEach(x=>{const k=x.data.slice(0,7);meses[k]=(meses[k]||0)+1;});
     const ordM=Object.keys(meses).sort();
     const porRep={};vis.forEach(x=>{const n=nomeRepVis(x);(n.length?n:["Sem empresa"]).forEach(k=>{porRep[k]=(porRep[k]||0)+1;});});
+    const vendasRep=S.reps.map(r=>[r.nome,vendasDe(vis,r.id)]).filter(([,s])=>s.valor>0).sort((a,b)=>b[1].valor-a[1].valor);
     html=`<div class="kpis4"><div class="kpi"><b>${REL.st==="realizada"?R_.real:R_.total}</b><span>${REL.st==="realizada"?"Visitas realizadas":"Visitas no período"}</span></div><div class="kpi"><b>${R_.clientes}</b><span>Clientes diferentes visitados</span></div><div class="kpi"><b>${R_.pedidos}</b><span>Pedidos fechados</span></div><div class="kpi"><b>${pct(R_.pedidos,R_.real)}</b><span>Pedidos por visita realizada</span></div></div>
-      <div class="kpis4"><div class="kpi"><b>${todas.real}</b><span>Realizadas (todas as empresas do filtro)</span></div><div class="kpi"><b>${todas.agend}</b><span>Ainda agendadas</span></div><div class="kpi"><b>${todas.canc}</b><span>Canceladas</span></div><div class="kpi"><b>${pct(todas.real,todas.real+todas.canc)}</b><span>Realizadas entre realizadas + canceladas</span></div></div>
+      <div class="kpis4"><div class="kpi"><b>R$ ${money(vd.valor)}</b><span>Vendas no período (sem frete e instalação)</span></div><div class="kpi"><b>R$ ${money(vd.com)}</b><span>Comissão estimada</span></div><div class="kpi"><b>${vd.n}</b><span>Vendas lançadas</span></div><div class="kpi"><b>${vd.n?"R$ "+money(vd.valor/vd.n):"—"}</b><span>Venda média</span></div></div>
+      ${aviso(vd)}
+      <div class="kpis4" style="margin-top:16px"><div class="kpi"><b>${todas.real}</b><span>Realizadas (todas as empresas do filtro)</span></div><div class="kpi"><b>${todas.agend}</b><span>Ainda agendadas</span></div><div class="kpi"><b>${todas.canc}</b><span>Canceladas</span></div><div class="kpi"><b>${pct(todas.real,todas.real+todas.canc)}</b><span>Realizadas entre realizadas + canceladas</span></div></div>
       <div class="dash">
         <section class="card"><h2>Resultado das visitas realizadas</h2>${Object.keys(porRes).length?barras(Object.entries(porRes).sort((a,b)=>b[1]-a[1])):`<p style="margin:0">Nenhuma visita realizada no período.</p>`}</section>
-        <section class="card"><h2>Por empresa</h2>${Object.keys(porRep).length?barras(Object.entries(porRep).sort((a,b)=>b[1]-a[1])):`<p style="margin:0">Sem dados no período.</p>`}<p class="lead" style="margin:10px 0 0;font-size:12px">Uma visita em nome de duas empresas conta nas duas linhas.</p></section>
-      </div>
-      ${ordM.length>1?`<section class="card" style="margin-top:16px"><h2>Visitas por mês</h2>${barras(ordM.map(k=>[rotMes(k),meses[k]]))}</section>`:""}`;
+        <section class="card"><h2>Vendas por empresa (R$)</h2>${vendasRep.length?barras(vendasRep.map(([n,s])=>[n,s.valor,"R$ "+money(s.valor)])):`<p style="margin:0">Nenhuma venda lançada no período. O valor é informado ao concluir a visita (opcional).</p>`}</section>
+        <section class="card"><h2>Visitas por empresa</h2>${Object.keys(porRep).length?barras(Object.entries(porRep).sort((a,b)=>b[1]-a[1])):`<p style="margin:0">Sem dados no período.</p>`}<p class="lead" style="margin:10px 0 0;font-size:12px">Uma visita em nome de duas empresas conta nas duas linhas.</p></section>
+        ${ordM.length>1?`<section class="card"><h2>Visitas por mês</h2>${barras(ordM.map(k=>[rotMes(k),meses[k]]))}</section>`:""}
+      </div>`;
     REL.csv=null;
   }else if(REL.aba==="empresa"){
-    const linhas=[];const nomes=S.reps.map(r=>[r.id,r.nome]);
+    const linhas=S.reps.map(r=>[r.nome,vis.filter(x=>(x.representadas||[]).includes(r.id)),r.id,r.comissao]);
     const sem=vis.filter(x=>!(x.representadas||[]).length);
-    nomes.forEach(([id,nome])=>{const l=vis.filter(x=>(x.representadas||[]).includes(id));linhas.push([nome,l]);});
-    if(sem.length)linhas.push(["Sem empresa",sem]);
-    const rows=linhas.map(([n,l])=>{const s=resumoDe(l);return[n,s.real,s.pedidos,s.neg,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real),s.min?fmtDur(s.min):"—"];}).sort((a,b)=>b[1]-a[1]);
-    html=`<section class="card"><h2>Visitas por empresa representada</h2>${barras(rows.map(r=>[r[0],r[1]]))}</section>`+tabelaRel(["Empresa","Realizadas","Pedidos fechados","Em negociação","Agendadas","Canceladas","Clientes visitados","Pedidos por visita","Tempo em visitas"],rows,"visitas-por-empresa")+`<p class="lead" style="margin-top:10px;font-size:12px">Uma visita em nome de duas empresas aparece nas duas linhas; o total geral do Resumo conta uma vez só.</p>`;
+    if(sem.length)linhas.push(["Sem empresa",sem,"_",null]);
+    let totCom=0,semCom=false;
+    const rows=linhas.map(([n,l,id,cm])=>{const s=resumoDe(l),vd=vendasDe(l,id);totCom+=vd.com;if(vd.semCom)semCom=true;
+      return[n,s.real,s.pedidos,s.neg,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real),money(vd.valor),cm!=null?String(cm).replace(".",",")+"%":"—",cm!=null?money(vd.com):"—"];}).sort((a,b)=>b[1]-a[1]);
+    html=`<section class="card"><h2>Visitas por empresa representada</h2>${barras(rows.map(r=>[r[0],r[1]]))}</section>`
+      +tabelaRel(["Empresa","Realizadas","Pedidos fechados","Em negociação","Agendadas","Canceladas","Clientes visitados","Pedidos por visita","Vendas (R$)","Comissão (%)","Comissão estimada (R$)"],rows,"visitas-por-empresa")
+      +`<div class="kpis4" style="margin-top:16px"><div class="kpi"><b>R$ ${money(totCom)}</b><span>Comissão estimada (soma das empresas)</span></div></div>`
+      +(semCom?`<div class="msg warn">Há vendas de empresas sem comissão cadastrada. Defina o percentual em <a href="#/representadas">Representadas</a>.</div>`:"")
+      +`<p class="lead" style="margin-top:10px;font-size:12px">Uma visita em nome de duas empresas aparece nas duas linhas; o total geral do Resumo conta uma vez só. A comissão é uma estimativa: valor vendido × percentual combinado com cada empresa.</p>`;
   }else if(REL.aba==="mes"){
     const g={};vis.forEach(x=>{const k=x.data.slice(0,7);(g[k]=g[k]||[]).push(x);});
     const ks=Object.keys(g).sort();
-    const rows=ks.map(k=>{const s=resumoDe(g[k]);return[rotMes(k),s.real,s.pedidos,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real)];});
-    html=(ks.length?`<section class="card"><h2>Visitas por mês</h2>${barras(ks.map(k=>[rotMes(k),g[k].length]))}</section>`:"")+tabelaRel(["Mês","Realizadas","Pedidos fechados","Agendadas","Canceladas","Clientes visitados","Pedidos por visita"],rows,"visitas-por-mes");
+    const rows=ks.map(k=>{const s=resumoDe(g[k]),vd=vendasDe(g[k]);return[rotMes(k),s.real,s.pedidos,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real),money(vd.valor),money(vd.com)];});
+    html=(ks.length?`<section class="card"><h2>Visitas por mês</h2>${barras(ks.map(k=>[rotMes(k),g[k].length]))}</section>`:"")+tabelaRel(["Mês","Realizadas","Pedidos fechados","Agendadas","Canceladas","Clientes visitados","Pedidos por visita","Vendas (R$)","Comissão estimada (R$)"],rows,"visitas-por-mes");
   }else if(REL.aba==="semana"){
     const g={};vis.forEach(x=>{const k=segundaDe(x.data);(g[k]=g[k]||[]).push(x);});
     const ks=Object.keys(g).sort();
-    const rows=ks.map(k=>{const s=resumoDe(g[k]);return[dataCurta(k)+" a "+dataCurta(somaDias(k,6)),s.real,s.pedidos,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real)];});
-    html=(ks.length?`<section class="card"><h2>Visitas por semana</h2>${barras(ks.map(k=>[dataCurta(k)+" a "+dataCurta(somaDias(k,6)),g[k].length]))}</section>`:"")+tabelaRel(["Semana (segunda a domingo)","Realizadas","Pedidos fechados","Agendadas","Canceladas","Clientes visitados","Pedidos por visita"],rows,"visitas-por-semana");
+    const rows=ks.map(k=>{const s=resumoDe(g[k]),vd=vendasDe(g[k]);return[dataCurta(k)+" a "+dataCurta(somaDias(k,6)),s.real,s.pedidos,s.agend,s.canc,s.clientes,pct(s.pedidos,s.real),money(vd.valor),money(vd.com)];});
+    html=(ks.length?`<section class="card"><h2>Visitas por semana</h2>${barras(ks.map(k=>[dataCurta(k)+" a "+dataCurta(somaDias(k,6)),g[k].length]))}</section>`:"")+tabelaRel(["Semana (segunda a domingo)","Realizadas","Pedidos fechados","Agendadas","Canceladas","Clientes visitados","Pedidos por visita","Vendas (R$)","Comissão estimada (R$)"],rows,"visitas-por-semana");
   }else if(REL.aba==="cliente"){
     const g={};vis.forEach(x=>{(g[x.cliente_id]=g[x.cliente_id]||[]).push(x);});
-    const rows=Object.entries(g).map(([id,l])=>{const c=cliPorId(id),s=resumoDe(l);const ult=l.filter(x=>eh(x,"realizada")).sort((a,b)=>b.data.localeCompare(a.data))[0];
+    const rows=Object.entries(g).map(([id,l])=>{const c=cliPorId(id),s=resumoDe(l),vd=vendasDe(l);const ult=l.filter(x=>eh(x,"realizada")).sort((a,b)=>b.data.localeCompare(a.data))[0];
       const reps=[...new Set(l.flatMap(nomeRepVis))].join(", ");
-      return[c?nomeCli(c):"Cliente removido",c?[c.cidade,c.uf].filter(Boolean).join("/"):"",reps,s.real,s.pedidos,ult?dataCurta(ult.data)+"/"+ult.data.slice(0,4):"—"];}).sort((a,b)=>b[3]-a[3]||a[0].localeCompare(b[0],"pt-BR"));
+      return[c?nomeCli(c):"Cliente removido",c?[c.cidade,c.uf].filter(Boolean).join("/"):"",reps,s.real,s.pedidos,money(vd.valor),ult?dataCurta(ult.data)+"/"+ult.data.slice(0,4):"—"];}).sort((a,b)=>b[3]-a[3]||a[0].localeCompare(b[0],"pt-BR"));
     const visitados=new Set(Object.keys(g));
     const sem=S.clientes.filter(c=>c.ativo&&!visitados.has(c.id)).sort((a,b)=>nomeCli(a).localeCompare(nomeCli(b),"pt-BR"));
-    html=tabelaRel(["Cliente","Cidade","Empresas","Realizadas","Pedidos fechados","Última visita"],rows,"visitas-por-cliente")
+    html=tabelaRel(["Cliente","Cidade","Empresas","Realizadas","Pedidos fechados","Vendas (R$)","Última visita"],rows,"visitas-por-cliente")
       +`<section class="card" style="margin-top:16px"><h2>Clientes sem nenhuma visita neste período (${sem.length})</h2>${sem.length?`<p style="margin:0">${sem.slice(0,60).map(c=>`<a href="#/clientes/${esc(c.id)}">${esc(nomeCli(c))}</a>`).join(" · ")}${sem.length>60?` · e mais ${sem.length-60}…`:""}</p>`:`<p style="margin:0">Todos os clientes tiveram visita no período.</p>`}</section>`;
   }else{
     const l=[...vis].sort((a,b)=>chaveVis(b).localeCompare(chaveVis(a)));
-    const rows=l.map(x=>{const c=cliPorId(x.cliente_id);return[dataCurta(x.data)+"/"+x.data.slice(0,4),hhmm(x.hora)||"",c?nomeCli(c):"Cliente removido",nomeRepVis(x).join(", "),STATUS_VIS[x.status]?STATUS_VIS[x.status][1]:x.status,x.resultado||"",x.assunto||"",(x.notas||"").replace(/\s+/g," ")];});
-    html=tabelaRel(["Data","Hora","Cliente","Empresas","Situação","Resultado","Assunto","Anotações"],rows,"visitas-lista");
+    const rows=l.map(x=>{const c=cliPorId(x.cliente_id);return[dataCurta(x.data)+"/"+x.data.slice(0,4),hhmm(x.hora)||"",c?nomeCli(c):"Cliente removido",nomeRepVis(x).join(", "),STATUS_VIS[x.status]?STATUS_VIS[x.status][1]:x.status,x.resultado||"",textoVendas(x),x.assunto||"",(x.notas||"").replace(/\s+/g," ")];});
+    html=tabelaRel(["Data","Hora","Cliente","Empresas","Situação","Resultado","Vendas","Assunto","Anotações"],rows,"visitas-lista");
   }
   box.innerHTML=html;
 }
